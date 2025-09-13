@@ -9,4 +9,5 @@ echo "Running tree demo (press Enter when you see the colored output):"
 echo ""
 
 # Run the demo with proper terminal settings
-TERM=xterm-256color ./target/debug/rolo
+# Enable multiplex mode so boxy honors fixed height
+BOXY_MULTIPLEX_MODE=1 TERM=xterm-256color ./target/debug/rolo

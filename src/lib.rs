@@ -74,6 +74,7 @@ pub fn create_input_pane(bounds: Rect, pane_id: usize, title: &str, focus_manage
             fixed_width: Some(pane_width),
             ..Default::default()
         },
+        fixed_height: Some(pane_height),
         ..Default::default()
     };
 
@@ -86,8 +87,11 @@ pub fn create_input_pane(bounds: Rect, pane_id: usize, title: &str, focus_manage
     container.add_child(background_frame);
 
     // Add input area as FOREGROUND child (renders on top)
-    // Position it inside the boxy frame area
-    let input_bounds = Rect::new(2, 2, pane_width.saturating_sub(4), 1);
+    // Anchor the input to the bottom inner edge of the pane
+    // - x offset 2 to sit inside the left border
+    // - y = height - 2 to sit on the last interior line (above bottom border)
+    let input_y = pane_height.saturating_sub(2);
+    let input_bounds = Rect::new(2, input_y, pane_width.saturating_sub(4), 1);
     let mut input_state = TextInputState::new("$ ");
     input_state.focused = is_focused;
 

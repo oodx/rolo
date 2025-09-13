@@ -61,6 +61,7 @@ pub fn create_input_pane(bounds: Rect, pane_id: usize, title: &str, focus_manage
             fixed_width: Some(bounds.width),
             ..Default::default()
         },
+        fixed_height: Some(bounds.height),
         ..Default::default()
     };
 
@@ -69,7 +70,9 @@ pub fn create_input_pane(bounds: Rect, pane_id: usize, title: &str, focus_manage
     });
 
     // Add input area as child (positioned inside the boxy frame)
-    let input_bounds = Rect::new(2, 2, bounds.width.saturating_sub(4), 1);
+    // Anchor to bottom interior line so it behaves like tmux prompt
+    let input_y = bounds.height.saturating_sub(2);
+    let input_bounds = Rect::new(2, input_y, bounds.width.saturating_sub(4), 1);
     let mut input_state = TextInputState::new("$ ");
     input_state.focused = is_focused;
 
@@ -335,6 +338,8 @@ pub struct Screen {
     pub buffer: Vec<Vec<char>>,
     pub color_buffer: Vec<Vec<String>>,
     pub dirty_lines: Vec<bool>,
+    pub cursor_x: Option<usize>,
+    pub cursor_y: Option<usize>,
 }
 
 impl Screen {
@@ -345,6 +350,8 @@ impl Screen {
             buffer: vec![vec![' '; width]; height],
             color_buffer: vec![vec![String::new(); width]; height],
             dirty_lines: vec![true; height],
+            cursor_x: None,
+            cursor_y: None,
         }
     }
 
@@ -357,6 +364,9 @@ impl Screen {
             }
             self.dirty_lines[row] = true;
         }
+        // reset cursor
+        self.cursor_x = None;
+        self.cursor_y = None;
     }
 
     /// Write text at position with optional color
@@ -479,6 +489,15 @@ impl Screen {
             }
         }
 
+        // After drawing dirty lines, position cursor if requested
+        if let (Some(cx), Some(cy)) = (self.cursor_x, self.cursor_y) {
+            if cx < self.width && cy < self.height {
+                output.push_str(&format!("\x1B[{};{}H", cy + 1, cx + 1));
+                // show cursor to make input feel interactive
+                output.push_str("\x1B[?25h");
+            }
+        }
+
         output
     }
 
@@ -571,6 +590,17 @@ impl RenderEngine {
                 // Get the current display line with cursor
                 let display_line = input_state.borrow().get_display_line();
                 self.screen.write_at(abs_bounds.x, abs_bounds.y, &display_line, Some(color.to_ansi()));
+
+                // Position the terminal cursor if this input is focused
+                if input_state.borrow().focused {
+                    let cursor_pos = input_state.borrow().prompt.len() + input_state.borrow().cursor_pos;
+                    let cursor_x = abs_bounds.x + cursor_pos;
+                    let cursor_y = abs_bounds.y;
+                    if cursor_x < self.screen.width && cursor_y < self.screen.height {
+                        self.screen.cursor_x = Some(cursor_x);
+                        self.screen.cursor_y = Some(cursor_y);
+                    }
+                }
             }
             NodeContent::Container => {
                 // Container nodes don't render themselves, just their children
