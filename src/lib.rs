@@ -1,4 +1,10 @@
+//! Rolo Terminal Layout Engine
+//!
+//! A render tree-based terminal multiplexer library inspired by yoga/ink but written in Rust.
+//! Provides screen-based differential rendering with stateful components.
+
 #![allow(unused_imports)]
+
 use std::collections::HashMap;
 use std::io::{self, Write};
 use std::cell::RefCell;
@@ -42,14 +48,21 @@ impl FocusManager {
     }
 }
 
-/// Create an input pane with boxy frame and input child
+/// Create an input pane with proper layering (container -> boxy background + input foreground)
 pub fn create_input_pane(bounds: Rect, pane_id: usize, title: &str, focus_manager: &FocusManager) -> RenderNode {
     let is_focused = focus_manager.is_active(pane_id);
 
-    // Create the boxy frame
+    // Capture dimensions before moving bounds
+    let pane_width = bounds.width;
+    let pane_height = bounds.height;
+
+    // Create container that holds everything
+    let mut container = RenderNode::new(bounds, NodeContent::Container);
+
+    // Add boxy frame as BACKGROUND child (renders first/behind)
     let frame_color = if is_focused { "cyan" } else { "white" };
     let boxy_config = boxy::BoxyConfig {
-        text: "".to_string(), // Empty content, input goes on top
+        text: "".to_string(), // Empty content
         title: Some(format!("{} {}", if is_focused { glyph("target") } else { glyph("dot") }, title)),
         colors: boxy::BoxColors {
             box_color: frame_color.to_string(),
@@ -58,18 +71,23 @@ pub fn create_input_pane(bounds: Rect, pane_id: usize, title: &str, focus_manage
             ..Default::default()
         },
         width: boxy::WidthConfig {
-            fixed_width: Some(bounds.width),
+            fixed_width: Some(pane_width),
             ..Default::default()
         },
         ..Default::default()
     };
 
-    let mut container = RenderNode::new(bounds, NodeContent::BoxyContent {
-        boxy_object: BoxyObject::new(boxy_config),
-    });
+    let background_frame = RenderNode::new(
+        Rect::new(0, 0, pane_width, pane_height), // Full size at container origin
+        NodeContent::BoxyContent {
+            boxy_object: BoxyObject::new(boxy_config),
+        }
+    );
+    container.add_child(background_frame);
 
-    // Add input area as child (positioned inside the boxy frame)
-    let input_bounds = Rect::new(2, 2, bounds.width.saturating_sub(4), 1);
+    // Add input area as FOREGROUND child (renders on top)
+    // Position it inside the boxy frame area
+    let input_bounds = Rect::new(2, 2, pane_width.saturating_sub(4), 1);
     let mut input_state = TextInputState::new("$ ");
     input_state.focused = is_focused;
 
@@ -77,8 +95,8 @@ pub fn create_input_pane(bounds: Rect, pane_id: usize, title: &str, focus_manage
         input_state: RefCell::new(input_state),
         color: if is_focused { Color::Yellow } else { Color::White },
     });
-
     container.add_child(input_node);
+
     container
 }
 
@@ -132,92 +150,76 @@ impl BoxyObject {
         self.mark_dirty();
     }
 
-    /// Clear all text content
-    pub fn clear_text(&self) {
-        self.config.borrow_mut().text.clear();
+    /// Update the box border color
+    pub fn update_box_color(&self, new_color: String) {
+        self.config.borrow_mut().colors.box_color = new_color;
         self.mark_dirty();
     }
 
-    /// Update the box color
-    pub fn update_box_color(&self, color: String) {
-        self.config.borrow_mut().colors.box_color = color;
-        self.mark_dirty();
-    }
-
-    /// Get the rendered box (re-renders if dirty)
-    pub fn render(&self) -> String {
-        let dirty = *self.dirty.borrow();
-        let has_cache = self.cached_render.borrow().is_some();
-
-        if dirty || !has_cache {
-            let config = self.config.borrow().clone();
-            let rendered = render_box_to_string(config);
-            *self.cached_render.borrow_mut() = Some(rendered.clone());
-            *self.dirty.borrow_mut() = false;
-            rendered
-        } else {
-            self.cached_render.borrow().as_ref().unwrap().clone()
-        }
-    }
-
-    /// Force re-render on next render() call
-    pub fn mark_dirty(&self) {
+    /// Mark this object as dirty (needs re-rendering)
+    fn mark_dirty(&self) {
         *self.dirty.borrow_mut() = true;
         *self.cached_render.borrow_mut() = None;
     }
 
-    /// Check if the object needs re-rendering
-    pub fn is_dirty(&self) -> bool {
-        *self.dirty.borrow()
+    /// Render this box, using cache if not dirty
+    pub fn render(&self) -> String {
+        let is_dirty = *self.dirty.borrow();
+
+        if !is_dirty {
+            if let Some(cached) = &*self.cached_render.borrow() {
+                return cached.clone();
+            }
+        }
+
+        // Re-render the box
+        let config = self.config.borrow().clone();
+        let rendered = render_box_to_string(config);
+
+        // Cache the result
+        *self.cached_render.borrow_mut() = Some(rendered.clone());
+        *self.dirty.borrow_mut() = false;
+
+        rendered
     }
 }
 
-/// Color system based on your gorgeous 256-color palette!
-#[derive(Debug, Clone, Copy)]
+/// ANSI color codes for terminal styling
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Color {
-    Red2,    // 197
-    Red,     // 31
-    Orange,  // 214
-    Yellow,  // 33
-    Green,   // 32
-    Blue,    // 36
-    Blue2,   // 39
-    Cyan,    // 14
-    Magenta, // 35
-    Purple,  // 213
-    Purple2, // 141
-    White,   // 248
-    White2,  // 15
-    Grey,    // 244
-    Grey2,   // 240
-    Reset,
+    Black,
+    Red,
+    Green,
+    Yellow,
+    Blue,
+    Purple,
+    Cyan,
+    White,
+    Red2,
+    Orange,
+    Grey,
 }
 
 impl Color {
-    fn to_ansi(&self) -> &'static str {
+    pub fn to_ansi(&self) -> &'static str {
         match self {
-            Color::Red2 => "\x1B[38;5;197m",
+            Color::Black => "\x1B[30m",
             Color::Red => "\x1B[31m",
-            Color::Orange => "\x1B[38;5;214m",
-            Color::Yellow => "\x1B[33m",
             Color::Green => "\x1B[32m",
-            Color::Blue => "\x1B[36m",
-            Color::Blue2 => "\x1B[38;5;39m",
-            Color::Cyan => "\x1B[38;5;14m",
-            Color::Magenta => "\x1B[35m",
-            Color::Purple => "\x1B[38;5;213m",
-            Color::Purple2 => "\x1B[38;5;141m",
-            Color::White => "\x1B[38;5;248m",
-            Color::White2 => "\x1B[38;5;15m",
+            Color::Yellow => "\x1B[33m",
+            Color::Blue => "\x1B[34m",
+            Color::Purple => "\x1B[35m",
+            Color::Cyan => "\x1B[36m",
+            Color::White => "\x1B[37m",
+            Color::Red2 => "\x1B[38;5;9m",
+            Color::Orange => "\x1B[38;5;214m",
             Color::Grey => "\x1B[38;5;244m",
-            Color::Grey2 => "\x1B[38;5;240m",
-            Color::Reset => "\x1B[0m",
         }
     }
 }
 
-/// Position and dimensions
-#[derive(Debug, Clone, Copy)]
+/// Rectangle bounds for positioning nodes
+#[derive(Debug, Clone)]
 pub struct Rect {
     pub x: usize,
     pub y: usize,
@@ -352,145 +354,143 @@ impl Screen {
             height,
             buffer: vec![vec![' '; width]; height],
             color_buffer: vec![vec![String::new(); width]; height],
-            dirty_lines: vec![true; height],
+            dirty_lines: vec![false; height],
         }
     }
 
-    /// Clear the entire screen buffer
+    /// Clear the screen buffer
     pub fn clear(&mut self) {
-        for row in 0..self.height {
-            for col in 0..self.width {
-                self.buffer[row][col] = ' ';
-                self.color_buffer[row][col].clear();
+        for row in &mut self.buffer {
+            for cell in row {
+                *cell = ' ';
             }
-            self.dirty_lines[row] = true;
+        }
+        for row in &mut self.color_buffer {
+            for cell in row {
+                cell.clear();
+            }
+        }
+        // Mark all lines as dirty since we cleared
+        for dirty in &mut self.dirty_lines {
+            *dirty = true;
         }
     }
 
-    /// Write text at position with optional color
+    /// Write text at specific position with optional color
     pub fn write_at(&mut self, x: usize, y: usize, text: &str, color: Option<&str>) {
         if y >= self.height { return; }
 
-        // Handle ANSI escape sequences in the text
-        if text.contains('\x1B') {
-            self.write_ansi_text(x, y, text);
-            return;
-        }
+        // Parse ANSI sequences and extract plain text with colors
+        let (plain_text, color_codes) = self.parse_ansi_text(text);
 
-        let chars: Vec<char> = text.chars().collect();
-        let mut col = x;
-        for &ch in chars.iter() {
-            if col >= self.width { break; }
+        let mut current_x = x;
+        let mut color_index = 0;
 
-            if self.buffer[y][col] != ch ||
-               (color.is_some() && self.color_buffer[y][col] != color.unwrap_or("")) {
-                self.buffer[y][col] = ch;
-                self.color_buffer[y][col] = color.unwrap_or("").to_string();
-                self.dirty_lines[y] = true;
-            }
+        for ch in plain_text.chars() {
+            if current_x >= self.width { break; }
 
-            // Advance column position by character width
+            // Get color for this character position
+            let char_color = if color_codes.len() > color_index {
+                &color_codes[color_index]
+            } else {
+                color.unwrap_or("")
+            };
+
+            self.buffer[y][current_x] = ch;
+            self.color_buffer[y][current_x] = char_color.to_string();
+            self.dirty_lines[y] = true;
+
+            // Handle Unicode width properly
             let char_width = ch.width().unwrap_or(1);
-
-            // For double-width characters, fill the next column with a placeholder
-            if char_width == 2 && col + 1 < self.width {
-                self.buffer[y][col + 1] = ' '; // Placeholder for second half of wide char
-                self.color_buffer[y][col + 1] = color.unwrap_or("").to_string();
-            }
-
-            col += char_width;
+            current_x += char_width;
+            color_index += 1;
         }
     }
 
-    /// Handle text that contains ANSI escape sequences (like boxy output)
-    fn write_ansi_text(&mut self, x: usize, y: usize, text: &str) {
-        if y >= self.height { return; }
-
-        let mut col = x;
-        let mut current_color = String::new();
+    /// Parse ANSI escape sequences from text
+    fn parse_ansi_text(&self, text: &str) -> (String, Vec<String>) {
+        let mut plain_text = String::new();
+        let mut color_codes = Vec::new();
         let mut chars = text.chars().peekable();
+        let mut current_color = String::new();
 
         while let Some(ch) = chars.next() {
             if ch == '\x1B' && chars.peek() == Some(&'[') {
-                // Parse ANSI escape sequence
+                // Start of ANSI sequence
                 chars.next(); // consume '['
-                let mut ansi_code = String::from("\x1B[");
+                let mut sequence = String::from("\x1B[");
 
-                while let Some(&next_ch) = chars.peek() {
-                    chars.next();
-                    ansi_code.push(next_ch);
-                    if next_ch == 'm' { // End of color code
-                        current_color = if ansi_code == "\x1B[0m" {
-                            String::new() // Reset
-                        } else {
-                            ansi_code
-                        };
+                // Collect the ANSI sequence
+                while let Some(seq_ch) = chars.next() {
+                    sequence.push(seq_ch);
+                    if seq_ch.is_ascii_alphabetic() {
                         break;
                     }
                 }
-            } else if col < self.width {
-                // Regular character - handle Unicode width properly
-                if self.buffer[y][col] != ch || self.color_buffer[y][col] != current_color {
-                    self.buffer[y][col] = ch;
-                    self.color_buffer[y][col] = current_color.clone();
-                    self.dirty_lines[y] = true;
+
+                // This is a color code, save it for future characters
+                if sequence.contains("38;5;") || sequence.contains("[3") {
+                    current_color = sequence;
+                } else if sequence == "\x1B[0m" {
+                    current_color.clear(); // Reset
                 }
-
-                // Advance column position by character width
-                let char_width = ch.width().unwrap_or(1);
-
-                // For double-width characters, fill the next column with a placeholder
-                if char_width == 2 && col + 1 < self.width {
-                    self.buffer[y][col + 1] = ' '; // Placeholder for second half
-                    self.color_buffer[y][col + 1] = current_color.clone();
-                }
-
-                col += char_width;
+            } else {
+                // Regular character
+                plain_text.push(ch);
+                color_codes.push(current_color.clone());
             }
         }
+
+        (plain_text, color_codes)
     }
 
-    /// Render only the dirty (changed) lines to terminal
+    /// Get differential screen updates (only changed lines)
     pub fn render_differential(&mut self) -> String {
         let mut output = String::new();
 
-        for row in 0..self.height {
-            if self.dirty_lines[row] {
+        for (y, is_dirty) in self.dirty_lines.iter().enumerate() {
+            if *is_dirty {
                 // Position cursor at start of line
-                output.push_str(&format!("\x1B[{};1H", row + 1));
+                output.push_str(&format!("\x1B[{};1H", y + 1));
 
-                // Render the entire line with color grouping
+                // Build line with grouped colors for efficiency
+                let mut line_output = String::new();
                 let mut current_color = String::new();
-                for col in 0..self.width {
-                    let cell_color = &self.color_buffer[row][col];
 
-                    // Only change color if it's different
-                    if cell_color != &current_color {
-                        if !current_color.is_empty() {
-                            output.push_str("\x1B[0m"); // Reset previous color
+                for (x, &ch) in self.buffer[y].iter().enumerate() {
+                    let char_color = &self.color_buffer[y][x];
+
+                    // Only add color code if it changed
+                    if char_color != &current_color {
+                        if !char_color.is_empty() {
+                            line_output.push_str(char_color);
+                        } else if !current_color.is_empty() {
+                            line_output.push_str("\x1B[0m"); // Reset color
                         }
-                        if !cell_color.is_empty() {
-                            output.push_str(cell_color);
-                        }
-                        current_color = cell_color.clone();
+                        current_color = char_color.clone();
                     }
 
-                    output.push(self.buffer[row][col]);
+                    line_output.push(ch);
                 }
 
-                // Reset color at end of line if needed
+                // Reset color at end of line if we had any color
                 if !current_color.is_empty() {
-                    output.push_str("\x1B[0m");
+                    line_output.push_str("\x1B[0m");
                 }
 
-                self.dirty_lines[row] = false;
+                output.push_str(&line_output);
             }
+        }
+
+        // Mark all lines as clean
+        for dirty in &mut self.dirty_lines {
+            *dirty = false;
         }
 
         output
     }
 
-    /// Initialize terminal for screen rendering
+    /// Initialize terminal for first render
     pub fn init_terminal() -> String {
         "\x1B[2J\x1B[?25l\x1B[1;1H".to_string() // Clear screen, hide cursor, go to top
     }
@@ -501,7 +501,8 @@ impl Screen {
     }
 }
 
-/// The main rendering engine that renders to a Screen
+/// Main render engine that manages the render tree and screen buffer
+#[derive(Debug)]
 pub struct RenderEngine {
     pub root: RenderNode,
     pub screen: Screen,
@@ -626,108 +627,4 @@ impl RenderEngine {
             }
         }
     }
-}
-
-fn main() {
-    // Enable RSB glyphs
-    glyph_enable();
-
-    // Get terminal size (simplified - in real implementation we'd use termios)
-    let terminal_size = (80, 24);
-
-    // Create render engine
-    let mut engine = RenderEngine::new(terminal_size);
-
-    // Create tmux-style multi-pane layout with focus management
-    let mut focus_manager = FocusManager::new();
-    focus_manager.add_pane(0); // Left pane
-    focus_manager.add_pane(1); // Right pane
-    focus_manager.add_pane(2); // Bottom pane
-
-    // Title at top
-    let title = RenderNode::new(
-        Rect::new(1, 1, 78, 1),
-        NodeContent::Text {
-            content: format!("{} Rolo Terminal Multiplexer - Press Tab to switch panes!", glyph("star")),
-            color: Color::Cyan,
-        },
-    );
-    engine.add_root_child(title);
-
-    // Create tmux-style panes layout
-
-    // Left pane (focused initially)
-    let left_pane = create_input_pane(
-        Rect::new(1, 3, 38, 10),
-        0,
-        "bash",
-        &focus_manager
-    );
-    engine.add_root_child(left_pane);
-
-    // Right pane (unfocused)
-    let right_pane = create_input_pane(
-        Rect::new(41, 3, 38, 10),
-        1,
-        "vim",
-        &focus_manager
-    );
-    engine.add_root_child(right_pane);
-
-    // Bottom pane (unfocused)
-    let bottom_pane = create_input_pane(
-        Rect::new(1, 15, 78, 8),
-        2,
-        "htop",
-        &focus_manager
-    );
-    engine.add_root_child(bottom_pane);
-
-    // Initialize terminal and render first frame
-    print!("{}", engine.init_terminal());
-    engine.render_to_screen();
-    print!("{}", engine.get_screen_updates());
-    io::stdout().flush().unwrap();
-
-    // TMUX-STYLE TERMINAL MULTIPLEXER!
-    println!("\n{} Tmux-style multi-pane terminal! Tab switches focus, Ctrl+C to exit...", glyph("target"));
-
-    let mut last_move = Instant::now();
-    let mut last_focus_switch = Instant::now();
-
-    loop {
-        let now = Instant::now();
-
-        // Move a random pane every 3 seconds (fun demo)
-        if now.duration_since(last_move) >= Duration::from_secs(3) {
-            println!("\n{} Moving random pane...", glyph("bolt"));
-            engine.move_random_child(terminal_size);
-            last_move = now;
-        }
-
-        // Auto-switch focus every 5 seconds for demo (normally user would press Tab)
-        if now.duration_since(last_focus_switch) >= Duration::from_secs(5) {
-            println!("\n{} Switching focus...", glyph("right"));
-            focus_manager.next_pane();
-
-            // TODO: In real implementation, we'd update the existing panes' focus state
-            // For now, just re-create the layout (inefficient but works for demo)
-
-            last_focus_switch = now;
-        }
-
-
-        // Re-render with differential updates
-        engine.render_to_screen();
-        print!("{}", engine.get_screen_updates());
-        io::stdout().flush().unwrap();
-
-        // Small sleep to prevent busy loop
-        std::thread::sleep(Duration::from_millis(100));
-    }
-
-    // Cleanup
-    print!("{}", engine.restore_terminal());
-    print!("\x1B[2J\x1B[1;1H"); // Clear screen and go to top
-    io::stdout().flush().unwrap();
 }
