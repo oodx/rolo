@@ -263,16 +263,8 @@ impl TextInputState {
     }
 
     pub fn get_display_line(&self) -> String {
-        if self.focused {
-            // Show cursor with blinking effect (simplified)
-            let mut display = format!("{}{}", self.prompt, self.buffer);
-            if self.cursor_pos <= self.buffer.len() {
-                display.insert(self.prompt.len() + self.cursor_pos, '█');
-            }
-            display
-        } else {
-            format!("{}{}", self.prompt, self.buffer)
-        }
+        // Always return prompt + buffer without embedded cursor
+        format!("{}{}", self.prompt, self.buffer)
     }
 }
 

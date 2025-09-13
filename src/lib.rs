@@ -265,15 +265,15 @@ impl TextInputState {
     }
 
     pub fn get_display_line(&self) -> String {
+        // Always return prompt + buffer without embedded cursor
+        format!("{}{}", self.prompt, self.buffer)
+    }
+
+    pub fn get_cursor_position(&self) -> Option<usize> {
         if self.focused {
-            // Show cursor with blinking effect (simplified)
-            let mut display = format!("{}{}", self.prompt, self.buffer);
-            if self.cursor_pos <= self.buffer.len() {
-                display.insert(self.prompt.len() + self.cursor_pos, '█');
-            }
-            display
+            Some(self.prompt.len() + self.cursor_pos)
         } else {
-            format!("{}{}", self.prompt, self.buffer)
+            None
         }
     }
 }
@@ -345,6 +345,8 @@ pub struct Screen {
     pub buffer: Vec<Vec<char>>,
     pub color_buffer: Vec<Vec<String>>,
     pub dirty_lines: Vec<bool>,
+    pub cursor_x: Option<usize>,
+    pub cursor_y: Option<usize>,
 }
 
 impl Screen {
@@ -355,6 +357,8 @@ impl Screen {
             buffer: vec![vec![' '; width]; height],
             color_buffer: vec![vec![String::new(); width]; height],
             dirty_lines: vec![false; height],
+            cursor_x: None,
+            cursor_y: None,
         }
     }
 
@@ -374,6 +378,9 @@ impl Screen {
         for dirty in &mut self.dirty_lines {
             *dirty = true;
         }
+        // Clear cursor position
+        self.cursor_x = None;
+        self.cursor_y = None;
     }
 
     /// Write text at specific position with optional color
@@ -444,6 +451,12 @@ impl Screen {
         (plain_text, color_codes)
     }
 
+    /// Set cursor position for rendering
+    pub fn set_cursor(&mut self, x: usize, y: usize) {
+        self.cursor_x = Some(x);
+        self.cursor_y = Some(y);
+    }
+
     /// Get differential screen updates (only changed lines)
     pub fn render_differential(&mut self) -> String {
         let mut output = String::new();
@@ -485,6 +498,13 @@ impl Screen {
         // Mark all lines as clean
         for dirty in &mut self.dirty_lines {
             *dirty = false;
+        }
+
+        // Add cursor positioning if set
+        if let (Some(cursor_x), Some(cursor_y)) = (self.cursor_x, self.cursor_y) {
+            if cursor_x < self.width && cursor_y < self.height {
+                output.push_str(&format!("\x1B[{};{}H", cursor_y + 1, cursor_x + 1));
+            }
         }
 
         output
@@ -577,9 +597,19 @@ impl RenderEngine {
                 }
             }
             NodeContent::TextInput { input_state, color } => {
-                // Get the current display line with cursor
+                // Get the display line without embedded cursor
                 let display_line = input_state.borrow().get_display_line();
                 self.screen.write_at(abs_bounds.x, abs_bounds.y, &display_line, Some(color.to_ansi()));
+
+                // Handle cursor positioning separately if focused
+                if let Some(cursor_pos) = input_state.borrow().get_cursor_position() {
+                    let cursor_x = abs_bounds.x + cursor_pos;
+                    let cursor_y = abs_bounds.y;
+                    if cursor_x < self.screen.width {
+                        // Set cursor position in screen buffer
+                        self.screen.set_cursor(cursor_x, cursor_y);
+                    }
+                }
             }
             NodeContent::Container => {
                 // Container nodes don't render themselves, just their children
