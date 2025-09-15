@@ -2,7 +2,9 @@
 
 use crate::cli::error::CliError;
 use crate::cli::helpers::{parse_column_count, show_version, show_help};
-use crate::width::validate_width;
+use crate::width::{validate_width, get_terminal_width};
+use crate::layout::{format_columns_with_config, LayoutConfig};
+use crate::stream::read_stdin;
 
 /// CLI configuration structure
 #[derive(Debug, Clone)]
@@ -10,6 +12,7 @@ pub struct CliConfig {
     pub mode: CliMode,
     pub columns: Option<usize>,
     pub width: Option<usize>,
+    pub gap: Option<usize>,
     pub headers: bool,
     pub help: bool,
     pub version: bool,
@@ -21,6 +24,7 @@ impl Default for CliConfig {
             mode: CliMode::Columns,
             columns: None,
             width: None,
+            gap: None,
             headers: false,
             help: false,
             version: false,
@@ -67,6 +71,17 @@ pub fn parse_args(args: &[String]) -> Result<CliConfig, CliError> {
                     .map_err(|e| CliError::InvalidWidth(format!("{}", e)))?;
                 config.width = Some(width);
             }
+            "--gap" => {
+                i += 1;
+                if i >= args.len() {
+                    return Err(CliError::MissingArgument("--gap requires a value".to_string()));
+                }
+                match args[i].parse::<usize>() {
+                    Ok(gap) if gap <= 20 => config.gap = Some(gap),
+                    Ok(gap) => return Err(CliError::InvalidArgument(format!("Gap too large (max 20): {}", gap))),
+                    Err(_) => return Err(CliError::InvalidArgument(format!("Invalid gap value: {}", args[i]))),
+                }
+            }
             "table" => config.mode = CliMode::Table,
             "list" => config.mode = CliMode::List,
             "columns" => config.mode = CliMode::Columns,
@@ -101,20 +116,34 @@ pub fn execute_cli(config: &CliConfig) -> Result<(), CliError> {
         return Ok(());
     }
 
-    // TODO: Integrate with actual layout processing
+    // Process input through layout system
     match config.mode {
         CliMode::Columns => {
             let cols = config.columns.unwrap_or(2);
-            println!("Processing input in {} columns mode", cols);
-            if let Some(width) = config.width {
-                println!("Using terminal width: {}", width);
-            }
+            let width = config.width.unwrap_or_else(|| get_terminal_width());
+            let gap = config.gap.unwrap_or(2);
+
+            let layout_config = LayoutConfig {
+                width,
+                gap,
+                padding: 1,
+            };
+
+            // Read input from stdin
+            let input = read_stdin()
+                .map_err(|e| CliError::ProcessingError(format!("Failed to read input: {}", e)))?;
+
+            // Format into columns
+            let output = format_columns_with_config(&input, cols, &layout_config)
+                .map_err(|e| CliError::ProcessingError(format!("Column formatting failed: {}", e)))?;
+
+            println!("{}", output);
         }
         CliMode::Table => {
-            println!("Processing input in table mode");
+            return Err(CliError::UnsupportedCommand("Table mode not yet implemented".to_string()));
         }
         CliMode::List => {
-            println!("Processing input in list mode");
+            return Err(CliError::UnsupportedCommand("List mode not yet implemented".to_string()));
         }
     }
 

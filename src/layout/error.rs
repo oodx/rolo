@@ -9,6 +9,10 @@ pub enum LayoutError {
     InvalidColumnCount(usize),
     /// Invalid width specification
     InvalidWidth(usize),
+    /// Width too small for the specified number of columns and gaps
+    WidthTooSmall(usize, usize),
+    /// Individual column width is too narrow to be useful
+    ColumnTooNarrow(usize),
     /// Text processing error
     ProcessingError(String),
     /// IO error during layout
@@ -23,6 +27,12 @@ impl fmt::Display for LayoutError {
             }
             LayoutError::InvalidWidth(width) => {
                 write!(f, "Invalid width: {}", width)
+            }
+            LayoutError::WidthTooSmall(width, gap_space) => {
+                write!(f, "Width {} is too small for gaps requiring {} spaces", width, gap_space)
+            }
+            LayoutError::ColumnTooNarrow(width) => {
+                write!(f, "Column width {} is too narrow (minimum 3)", width)
             }
             LayoutError::ProcessingError(msg) => {
                 write!(f, "Text processing error: {}", msg)

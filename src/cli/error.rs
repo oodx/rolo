@@ -14,6 +14,8 @@ pub enum CliError {
     UnsupportedCommand(String),
     /// General CLI parsing error
     ParseError(String),
+    /// Error during input processing
+    ProcessingError(String),
 }
 
 impl fmt::Display for CliError {
@@ -24,6 +26,7 @@ impl fmt::Display for CliError {
             CliError::InvalidWidth(val) => write!(f, "Invalid width value: {}", val),
             CliError::UnsupportedCommand(cmd) => write!(f, "Unsupported command: {}", cmd),
             CliError::ParseError(msg) => write!(f, "Parse error: {}", msg),
+            CliError::ProcessingError(msg) => write!(f, "Processing error: {}", msg),
         }
     }
 }

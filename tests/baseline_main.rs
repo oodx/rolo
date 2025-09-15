@@ -12,7 +12,11 @@ mod default_behavior;
 #[path = "baseline/error_handling.rs"]
 mod error_handling;
 
+#[path = "baseline/column_mode.rs"]
+mod column_mode;
+
 // Re-export baseline tests
 pub use core_functionality::*;
 pub use default_behavior::*;
 pub use error_handling::*;
+pub use column_mode::*;
