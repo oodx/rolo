@@ -1,6 +1,6 @@
 [package]
 name = "rolo"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["RSB Contributors"]
 description = "Text layout tool for Unix pipelines - the spiritual love child of pr, paste, and col"
