@@ -1,21 +1,82 @@
-# Rolo
+# Rolo 🧩
 
-Text layout tool for Unix pipelines - the spiritual love child of `pr`, `paste`, and `col`.
+**Rolo**: The Spiritual Love Child of Unix Commands
 
-## Overview
+Rolo is a pragmatic, powerful text layout tool that brings the elegance of Unix pipeline processing to text formatting. Inspired by classic commands like `pr`, `paste`, and `col`, Rolo provides flexible, intelligent text layout capabilities.
 
-Rolo is a Rust CLI utility for column and table layout of text streams. It provides ANSI-aware width handling, streaming performance, and integrates seamlessly with jynx (syntax highlighting) and boxy (decoration) via Unix pipes.
+## 🚀 Project Status: v0.2 (In Development)
 
-## Features
+### Sprint Progress
+- ✅ Sprint 1-2 Foundation (v0.1): 6/6 tasks complete (15/15 points)
+- 🔨 Sprint 3-4 Core Modes (v0.2): 1/5 tasks complete (5/21 points)
 
-- **Column Mode**: Format text in N columns with proper alignment
-- **Table Mode**: Auto-detect column widths and format as tables
-- **List Mode**: Single column formatting with optional line numbers
-- **ANSI-aware**: Correctly handles colored text and Unicode
-- **Streaming**: Processes large datasets efficiently
-- **Pipeline-friendly**: Works seamlessly with jynx and boxy
+## ✨ Latest Achievement: Column Mode (TASK-007)
 
-## Installation
+Rolo now supports intelligent column-based text layout with:
+- ANSI-aware width handling
+- Flexible column configuration
+- Minimal pipeline overhead
+
+### Quick Example
+```bash
+echo "a b c d" | rolo --cols 2
+```
+
+## 🛠 Features
+
+1. **RSB Framework Integration**
+   - Compliant with MODULE_SPEC
+   - AGPL Licensed
+   - Modular, type-safe design
+
+2. **Intelligent Text Processing**
+   - Unix pipeline friendly
+   - ANSI/Unicode width support
+   - Configurable layout modes
+
+3. **Flexible CLI**
+   - Multiple layout modes
+   - Comprehensive help and version information
+   - Robust error handling
+
+### Feature Flags
+- `width-boxy`: Boxy-powered width calculations
+- `visual`: Enhanced visual processing
+- `csv-support`: CSV layout optimizations
+- `json-support`: JSON-aware formatting
+
+## 🔧 Upcoming Tasks
+
+- TASK-008: Table Mode Implementation
+- TASK-009: List Mode Implementation
+- TASK-010: Terminal Width Detection
+
+## 💻 Usage Examples
+
+### Column Mode
+```bash
+# Basic 2-column layout
+cat data.txt | rolo --cols 2
+
+# Custom gap between columns
+cat data.txt | rolo --cols 3 --gap 4
+```
+
+### Pipeline Integration
+```bash
+# Complex pipeline with jynx and boxy
+command | jynx | rolo --cols 3 | boxy --title "Results"
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Implement your feature
+4. Add comprehensive tests
+5. Submit a pull request
+
+## 📦 Installation
 
 ```bash
 # Build and deploy locally
@@ -26,23 +87,14 @@ cargo build --release
 cp target/release/rolo ~/.local/bin/odx/
 ```
 
-## Usage
+## 📄 License
 
-```bash
-# Column mode
-echo "apple banana cherry date" | rolo --cols 2
+AGPL-3.0-or-later
 
-# Table mode
-cat data.tsv | rolo --table --headers
+## 🔬 Development Philosophy
 
-# Pipeline integration
-command | jynx | rolo --cols 3 | boxy --title "Results"
-```
+Rolo embraces the Unix philosophy: do one thing, do it well, and play nicely with other tools. Built with ❤️ using Rust and the RSB Framework.
 
-## Development Status
+---
 
-This is v0.1.0 - foundational structure is complete, core functionality coming in Sprint 1-2.
-
-## License
-
-AGPL-3.0-or-later - see LICENSE file.
+*Crafted with precision, inspired by the timeless elegance of Unix pipelines.*

@@ -44,6 +44,7 @@ fn visual_uat_basic_list_formatting() {
         mode: CliMode::List,
         columns: None,
         width: Some(80),
+        gap: None,
         headers: false,
         help: false,
         version: false,

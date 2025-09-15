@@ -59,6 +59,7 @@ fn visual_uat_basic_column_formatting() {
         mode: CliMode::Columns,
         columns: Some(2),
         width: Some(80),
+        gap: None,
         headers: false,
         help: false,
         version: false,

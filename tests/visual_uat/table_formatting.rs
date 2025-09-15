@@ -49,6 +49,7 @@ fn visual_uat_basic_table_formatting() {
         mode: CliMode::Table,
         columns: None,
         width: Some(80),
+        gap: None,
         headers: false,
         help: false,
         version: false,
