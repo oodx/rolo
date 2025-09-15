@@ -54,6 +54,7 @@ set -- "${ARGS[@]}"
 declare -A TESTS=(
     # Core functionality tests
     ["sanity"]="sanity_main"                     # Sanity package (core + baseline)
+    ["baseline"]="baseline_main"                 # Baseline tests (no features required)
     ["layout"]="features_layout"                 # Layout module tests (column/table/list)
     ["width"]="features_width"                   # Width calculation tests (boxy adapter)
     ["stream"]="features_stream"                 # Stream processing tests
@@ -70,17 +71,18 @@ declare -A TESTS=(
     ["uat-tables"]="uat_main"                    # UAT: table mode demo
     ["uat-themes"]="uat_main"                    # UAT: theme system demo
     ["uat-pipeline"]="uat_main"                  # UAT: pipeline demo
+    ["visual-uat"]="visual_uat_main.rs"          # Visual UAT: executive formatting demos
 
     # Performance tests
     ["perf"]="performance_baseline"              # Performance baseline tests
     ["bench"]="sh/benchmark"                     # Benchmarking script
 
     # Feature-gated tests
-    ["width-boxy"]="features_width"              # Width tests with boxy feature
-    ["visual"]="features_visual"                 # Visual output tests
-    ["csv"]="features_csv"                       # CSV plugin tests
-    ["json"]="features_json"                     # JSON plugin tests
-    ["markdown"]="features_markdown"             # Markdown plugin tests
+    ["width-boxy"]="feature_gated_main"          # Width tests with boxy feature
+    ["visual"]="feature_gated_main"              # Visual output tests
+    ["csv"]="feature_gated_main"                 # CSV plugin tests
+    ["json"]="feature_gated_main"                # JSON plugin tests
+    ["markdown"]="feature_gated_main"            # Markdown plugin tests
 
     # Comprehensive suites
     ["all"]="all-tests"                          # Run all test categories
@@ -103,6 +105,7 @@ Options:
 
 Core Tests:
   sanity                 Core functionality unit tests (Rust)
+  baseline               Baseline tests (no features required)
   layout                 Layout module tests (column/table/list)
   width                  Width calculation tests (boxy adapter)
   stream                 Stream processing tests
@@ -119,6 +122,7 @@ UAT Tests:
   uat-tables             Table mode demonstration
   uat-themes             Theme system demonstration
   uat-pipeline           Pipeline demonstration
+  visual-uat             Visual formatting demonstrations
 
 Suites:
   all                    Run all test categories
@@ -141,6 +145,7 @@ EOF
         echo
         echo "Core Tests:"
         echo "  sanity                 Core functionality unit tests (Rust)"
+        echo "  baseline               Baseline tests (no features required)"
         echo "  layout                 Layout module tests (column/table/list)"
         echo "  width                  Width calculation tests (boxy adapter)"
         echo "  stream                 Stream processing tests"
@@ -157,6 +162,7 @@ EOF
         echo "  uat-tables             Table mode demonstration"
         echo "  uat-themes             Theme system demonstration"
         echo "  uat-pipeline           Pipeline demonstration"
+        echo "  visual-uat             Visual formatting demonstrations"
         echo
         echo "Suites:"
         echo "  all                    Run all test categories"
@@ -246,10 +252,10 @@ run_test() {
         # Determine feature flags needed
         local features=""
         case "$test_name" in
-            *width-boxy*|*visual*|*theme*|*csv*|*json*|*markdown*)
-                features="--features width-boxy,visual,csv,json,markdown"
+            *width-boxy*|*theme*|*csv*|*json*|*markdown*)
+                features="--features width-boxy,visual,csv-support"
                 ;;
-            *uat*|*pipeline*)
+            *visual*|*uat*|*pipeline*)
                 features="--features width-boxy,visual"
                 ;;
         esac
@@ -284,6 +290,7 @@ run_test() {
     case "$test_name" in
         "all")
             # Run a broad set of tests across categories
+            "$0" run baseline
             "$0" run sanity
             "$0" run layout
             "$0" run width
@@ -292,12 +299,13 @@ run_test() {
             "$0" run pipeline
             "$0" run uat-columns
             "$0" run uat-tables
+            "$0" run visual-uat
             ;;
         "smoke")
             # Quick smoke tests
+            "$0" run baseline
             "$0" run sanity
             "$0" run layout
-            "$0" run width
             ;;
         "full")
             # Comprehensive test suite

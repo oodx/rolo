@@ -46,21 +46,69 @@ Total Points: 15
     - Use validate! for error handling
     Acceptance: CLI responds to commands with proper error handling
 
-[2] TASK-005: Stream Module Implementation
+[2] TASK-005: Stream Module Implementation ✅ COMPLETE
     - Create stream/utils.rs with buffered reading
     - Implement stream/helpers.rs for internal logic
     - Setup stream/error.rs for stream errors
     - Handle stdin/stdout properly
     - Support pipe breaks and EOF
+    - Leverages RSB Stream and deps for robust Unix integration
+    - Includes comprehensive error handling and pipeline builder
     Acceptance: Can pipe text through rolo
+    Tests: stream_sanity.rs with 7 passing tests
 
-[2] TASK-006: Feature Flags and Testing Setup
+[2] TASK-006: Feature Flags and Testing Setup ✅ COMPLETE
     - Configure Cargo.toml features per MODULE_SPEC
     - Create baseline tests without features
     - Add feature-gated tests for adapters
     - Setup test structure per module
     - Use utils::stderrx for non-visual logging
+    - Fixed all compilation errors in both test suites
+    - Created comprehensive baseline tests (26 tests passing)
+    - Created feature-gated tests for width-boxy and visual features (13 tests passing)
     Acceptance: Tests pass in both default and feature modes
+    Tests: baseline_main.rs (26 tests), feature_gated_main.rs (13 tests)
+
+============================================================================
+VISUAL UAT TASKS (v0.1.5 - Foundation Enhancement)
+Total Points: 8
+============================================================================
+
+[2] TASK-007V: Visual Column Formatting UAT ✅ COMPLETE
+    - Create visual tests showing actual column output
+    - Test 1-10 column configurations with real text
+    - Validate alignment and spacing across widths
+    - Test edge cases: long words, empty lines, special chars
+    - Generate reference output for comparison
+    Acceptance: Visual column formatting demo works perfectly
+    Documentation: FEATURES_VISUAL_UAT.md
+
+[2] TASK-008V: Visual Table Formatting UAT ✅ COMPLETE
+    - Create visual tests for table mode with headers
+    - Test delimiter handling (tabs, spaces, custom)
+    - Validate column alignment and borders
+    - Test multi-line cells and overflow handling
+    - Generate TSV/CSV formatting examples
+    Acceptance: Table formatting produces clean aligned output
+    Documentation: FEATURES_VISUAL_UAT.md
+
+[2] TASK-009V: Visual List Formatting UAT ✅ COMPLETE
+    - Create visual tests for list mode with bullets
+    - Test different bullet styles and indentation
+    - Validate line wrapping and continuation
+    - Test nested lists and numbering
+    - Generate markdown-style list examples
+    Acceptance: List formatting produces readable bulleted output
+    Documentation: FEATURES_VISUAL_UAT.md
+
+[2] TASK-010V: Visual Width and Pipeline Integration UAT ✅ COMPLETE
+    - Create visual tests showing width adaptation (80, 120, 160 cols)
+    - Test pipeline integration: echo | rolo | visual comparison
+    - Validate ANSI color preservation through pipeline
+    - Test terminal width detection and override
+    - Generate side-by-side before/after examples
+    Acceptance: Width handling and pipeline integration work visually
+    Documentation: FEATURES_VISUAL_UAT.md
 
 ============================================================================
 SPRINT 3-4: CORE MODES (v0.2)

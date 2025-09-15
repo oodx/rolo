@@ -9,9 +9,7 @@
 pub mod layout;
 pub mod width;
 pub mod cli;
-
-// Stream module (placeholder structure)
-// TODO: Implement remaining modules in subsequent tasks
+pub mod stream;
 
 /// Prelude with curated exports per MODULE_SPEC
 pub mod prelude {
@@ -24,15 +22,21 @@ pub mod prelude {
     // CLI functionality
     pub use crate::cli::{CliConfig, CliMode, parse_args, execute_cli, dispatch_cli};
 
+    // Stream processing functionality
+    pub use crate::stream::{
+        read_stdin, write_stdout, stdin_to_stream, stream_to_stdout,
+        pipe_transform, pipe_lines, create_pipeline, Pipeline,
+        StreamConfig, LineEnding
+    };
+
     // Error types for comprehensive error handling
     pub use crate::width::error::WidthError;
     pub use crate::layout::error::LayoutError;
     pub use crate::cli::error::CliError;
+    pub use crate::stream::StreamError;
 
     // Module-owned macros
     pub use crate::layout_config;
-
-    // TODO: Add Stream module as it is implemented
 }
 
 // Re-export prelude at crate root for convenience
