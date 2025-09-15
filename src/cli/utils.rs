@@ -14,6 +14,7 @@ pub struct CliConfig {
     pub width: Option<usize>,
     pub gap: Option<usize>,
     pub delimiter: Option<String>,
+    pub fit_mode: bool,
     pub headers: bool,
     pub help: bool,
     pub version: bool,
@@ -27,6 +28,7 @@ impl Default for CliConfig {
             width: None,
             gap: None,
             delimiter: None,
+            fit_mode: true, // Default to fit mode
             headers: false,
             help: false,
             version: false,
@@ -94,6 +96,12 @@ pub fn parse_args(args: &[String]) -> Result<CliConfig, CliError> {
             "--table" => {
                 config.mode = CliMode::Table;
             }
+            "--fit" => {
+                config.fit_mode = true;
+            }
+            "--no-fit" => {
+                config.fit_mode = false;
+            }
             "table" => config.mode = CliMode::Table,
             "list" => config.mode = CliMode::List,
             "columns" => config.mode = CliMode::Columns,
@@ -132,7 +140,11 @@ pub fn execute_cli(config: &CliConfig) -> Result<(), CliError> {
     match config.mode {
         CliMode::Columns => {
             let cols = config.columns.unwrap_or(2);
-            let width = config.width.unwrap_or_else(|| get_terminal_width());
+            let width = if config.fit_mode {
+                config.width.unwrap_or_else(|| get_terminal_width())
+            } else {
+                config.width.unwrap_or(80) // Fixed width when not in fit mode
+            };
             let gap = config.gap.unwrap_or(2);
 
             let layout_config = LayoutConfig {
@@ -153,7 +165,11 @@ pub fn execute_cli(config: &CliConfig) -> Result<(), CliError> {
         }
         CliMode::Table => {
             let delimiter = config.delimiter.as_deref().unwrap_or("\t");
-            let width = config.width.unwrap_or_else(|| get_terminal_width());
+            let width = if config.fit_mode {
+                config.width.unwrap_or_else(|| get_terminal_width())
+            } else {
+                config.width.unwrap_or(80) // Fixed width when not in fit mode
+            };
 
             // Read input from stdin
             let input = read_stdin()

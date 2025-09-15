@@ -153,12 +153,21 @@ Total Points: 21
     - Width constraints
     Acceptance: ls | rolo --list works
 
-[3] TASK-010: Terminal Width Detection
+[3] TASK-010: Terminal Width Detection ✅ COMPLETE
     - Integrate RSB host module for $COLUMNS
     - Implement --width override
     - Add --fit mode (default)
     - Handle terminal resize
-    Acceptance: Respects terminal width
+    - Enhanced terminal width detection with multiple fallback methods
+    - COLUMNS, TERM_WIDTH, WIDTH environment variable support
+    - ioctl system call detection on Unix systems (with libc feature)
+    - tput command fallback for maximum compatibility
+    - --fit mode enabled by default with --no-fit override option
+    - Terminal resize detection capabilities with atomic change tracking
+    - Width constraints validation (10-500 character range)
+    Acceptance: Respects terminal width ✅ VERIFIED
+    Enhanced: Multiple detection methods, resize handling, comprehensive CLI integration
+    Tests: 12 comprehensive terminal width detection tests added to baseline
 
 [3] TASK-011: Separator Support
     - Implement --sep for input splitting

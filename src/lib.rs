@@ -17,7 +17,7 @@ pub mod prelude {
     pub use crate::layout::{format_columns, format_columns_with_config, format_columns_with_delimiter, format_table, format_table_with_config, format_list, LayoutConfig};
 
     // Width calculation functionality
-    pub use crate::width::{get_display_width, get_terminal_width, validate_width};
+    pub use crate::width::{get_display_width, get_terminal_width, validate_width, check_terminal_resize};
 
     // CLI functionality
     pub use crate::cli::{CliConfig, CliMode, parse_args, execute_cli, dispatch_cli};
