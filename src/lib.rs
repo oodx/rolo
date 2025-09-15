@@ -14,7 +14,7 @@ pub mod stream;
 /// Prelude with curated exports per MODULE_SPEC
 pub mod prelude {
     // Layout functionality
-    pub use crate::layout::{format_columns, format_columns_with_config, format_table, format_list, LayoutConfig};
+    pub use crate::layout::{format_columns, format_columns_with_config, format_columns_with_delimiter, format_table, format_table_with_config, format_list, LayoutConfig};
 
     // Width calculation functionality
     pub use crate::width::{get_display_width, get_terminal_width, validate_width};

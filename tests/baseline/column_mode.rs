@@ -218,3 +218,42 @@ fn test_column_mode_width_constraints() {
     assert!(result.is_err());
     assert!(matches!(result.unwrap_err(), LayoutError::ColumnTooNarrow(_)));
 }
+
+#[test]
+fn test_column_mode_delimiter_support() {
+    use rolo::prelude::*;
+
+    let config = LayoutConfig::default();
+
+    // Test comma delimiter
+    let input = "apple,banana,cherry,date";
+    let result = format_columns_with_delimiter(input, 2, &config, Some(","));
+    assert!(result.is_ok());
+    let output = result.unwrap();
+    assert_eq!(output.lines().count(), 2);
+    assert!(output.contains("apple"));
+    assert!(output.contains("banana"));
+    assert!(output.contains("cherry"));
+    assert!(output.contains("date"));
+
+    // Test space delimiter
+    let input = "one two three four";
+    let result = format_columns_with_delimiter(input, 2, &config, Some(" "));
+    assert!(result.is_ok());
+    let output = result.unwrap();
+    assert_eq!(output.lines().count(), 2);
+
+    // Test semicolon delimiter
+    let input = "red;green;blue;yellow";
+    let result = format_columns_with_delimiter(input, 2, &config, Some(";"));
+    assert!(result.is_ok());
+    let output = result.unwrap();
+    assert_eq!(output.lines().count(), 2);
+
+    // Test that newlines still work (backwards compatibility)
+    let input = "line1\nline2\nline3\nline4";
+    let result = format_columns_with_delimiter(input, 2, &config, None);
+    assert!(result.is_ok());
+    let output = result.unwrap();
+    assert_eq!(output.lines().count(), 2);
+}

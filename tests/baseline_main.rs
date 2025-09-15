@@ -15,8 +15,16 @@ mod error_handling;
 #[path = "baseline/column_mode.rs"]
 mod column_mode;
 
+#[path = "baseline/table_mode.rs"]
+mod table_mode;
+
+#[path = "baseline/integration_with_test_data.rs"]
+mod integration_with_test_data;
+
 // Re-export baseline tests
 pub use core_functionality::*;
 pub use default_behavior::*;
 pub use error_handling::*;
 pub use column_mode::*;
+pub use table_mode::*;
+pub use integration_with_test_data::*;

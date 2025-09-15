@@ -50,6 +50,7 @@ fn visual_uat_basic_table_formatting() {
         columns: None,
         width: Some(80),
         gap: None,
+        delimiter: None,
         headers: false,
         help: false,
         version: false,

@@ -120,19 +120,31 @@ Total Points: 21
     - Implement column layout algorithm
     - Handle ANSI-aware width padding
     - Add --gap option for spacing
+    - Add --delim option for custom input delimiters (space, comma, semicolon, etc.)
     - Comprehensive column formatting with config support
     - ANSI-aware width calculation using boxy adapter
     - Gap spacing and width constraints implemented
     - Proper error handling for edge cases
+    - Support for both newline (default) and custom delimiters
     Acceptance: echo -e "a\nb\nc\nd" | rolo --cols 2 works (produces 2 columns)
+    Enhanced: echo "a,b,c,d" | rolo --cols 2 --delim "," works with comma delimiter
     Tests: 11 comprehensive column mode tests added to baseline
 
-[5] TASK-008: Table Mode Implementation
+[5] TASK-008: Table Mode Implementation ✅ COMPLETE
     - Parse --table flag
     - Auto-detect column widths
     - Implement --delim for parsing
     - Handle row overflow
-    Acceptance: cat data.tsv | rolo --table works
+    - Comprehensive table formatting with auto-width detection
+    - ANSI-aware width calculation and Unicode support
+    - Row overflow handling for uneven row structures
+    - Header row detection with automatic separator insertion
+    - Width constraints with proportional column compression
+    - Content truncation with ellipsis for overflow
+    - Support for multiple delimiters (TSV, CSV, custom)
+    Acceptance: cat tests/data/sample.tsv | rolo --table works ✅ VERIFIED
+    Enhanced: CSV, semicolon, and custom delimiter support via --delim
+    Tests: 14 comprehensive table mode tests added to baseline
 
 [3] TASK-009: List Mode Implementation
     - Single column formatting

@@ -60,6 +60,7 @@ fn visual_uat_basic_column_formatting() {
         columns: Some(2),
         width: Some(80),
         gap: None,
+        delimiter: None,
         headers: false,
         help: false,
         version: false,
