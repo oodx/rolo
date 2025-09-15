@@ -21,9 +21,9 @@ path = "src/lib.rs"
 # RSB Framework for string-biased, pragmatic Rust patterns
 rsb = { path = "../rsb" }
 
-# Width calculation dependencies (for boxy adapter)
+# Width calculation dependencies (for boxy adapter) - matching boxy versions
 strip-ansi-escapes = { version = "0.2", optional = true }
-unicode-width = { version = "0.1", optional = true }
+unicode-width = { version = "0.2.1", features = ["std"], optional = true }
 
 # Optional format support
 csv = { version = "1.3", optional = true }

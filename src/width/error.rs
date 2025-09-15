@@ -8,6 +8,10 @@ pub enum WidthError {
     InvalidInput(String),
     /// Width calculation failed
     CalculationError(String),
+    /// Width value out of valid range
+    InvalidRange(usize, usize, usize),
+    /// Terminal access error
+    TerminalError(String),
 }
 
 impl fmt::Display for WidthError {
@@ -15,6 +19,10 @@ impl fmt::Display for WidthError {
         match self {
             WidthError::InvalidInput(msg) => write!(f, "Invalid input: {}", msg),
             WidthError::CalculationError(msg) => write!(f, "Width calculation error: {}", msg),
+            WidthError::InvalidRange(value, min, max) => {
+                write!(f, "Width {} out of range ({}-{})", value, min, max)
+            },
+            WidthError::TerminalError(msg) => write!(f, "Terminal access error: {}", msg),
         }
     }
 }
