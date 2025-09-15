@@ -1,0 +1,163 @@
+ROLO DEVELOPMENT ROADMAP
+========================
+Text Layout Tool for Unix Pipelines
+Last Updated: 2025-09-15
+
+PROJECT VISION
+--------------
+Rolo: The spiritual love child of pr, paste, and col
+A structured data layout tool that fits seamlessly into pipelines with jynx and boxy
+RSB-powered, ANSI-aware, blazing fast
+
+MILESTONE OVERVIEW
+------------------
+v0.1 - Foundation (Sprint 1-2)
+v0.2 - Core Modes (Sprint 3-4)
+v0.3 - Integration (Sprint 5-6)
+v0.4 - Polish (Sprint 7-8)
+v0.5 - Plugins (Sprint 9-10)
+v1.0 - Production (Sprint 11-12)
+
+============================================================================
+
+MILESTONE 1: v0.1 - Foundation [Story Points: 13]
+--------------------------------------------------
+Goal: RSB setup, width calculation, basic streaming
+Target: Sprint 1-2
+
+Deliverables:
+- RSB framework integration complete
+- Boxy width_plugin integrated and tested
+- Basic CLI with RSB Args/dispatch
+- Streaming stdin/stdout pipeline
+- Project structure following RSB MODULE_SPEC
+
+Success Criteria:
+- Can read from stdin and write to stdout
+- Correctly calculates display width for ANSI/Unicode text
+- RSB patterns properly implemented
+- Dual library/cli mode working
+
+============================================================================
+
+MILESTONE 2: v0.2 - Core Modes [Story Points: 21]
+---------------------------------------------------
+Goal: Column and Table modes functional
+Target: Sprint 3-4
+
+Deliverables:
+- Column mode: --cols N with proper alignment
+- Table mode: --table with auto-width detection
+- List mode: Single column formatted output
+- Basic separator/delimiter support
+- Terminal width detection ($COLUMNS)
+
+Success Criteria:
+- All three core modes working with ANSI text
+- Proper width handling across modes
+- Can process 1k+ lines without issues
+- Integration tests with sample data
+
+============================================================================
+
+MILESTONE 3: v0.3 - Integration [Story Points: 13]
+---------------------------------------------------
+Goal: Ecosystem integration with jynx/boxy
+Target: Sprint 5-6
+
+Deliverables:
+- Pipeline tests with jynx → rolo → boxy
+- Theme compatibility research
+- RSB TokenStream format support
+- Performance benchmarks established
+- Documentation for common use cases
+
+Success Criteria:
+- Works seamlessly in pipelines
+- No color code corruption
+- TokenStream parsing functional
+- Benchmarks show acceptable performance
+
+============================================================================
+
+MILESTONE 4: v0.4 - Polish [Story Points: 13]
+----------------------------------------------
+Goal: UX improvements and robustness
+Target: Sprint 7-8
+
+Deliverables:
+- Advanced options (--gap, --pad, --align)
+- Border styles (none, ascii, unicode)
+- Truncation policies (ellipsis, wrap)
+- Error handling improvements
+- Comprehensive test suite
+
+Success Criteria:
+- Handles edge cases gracefully
+- Clear error messages following RSB patterns
+- 80%+ test coverage
+- README with examples
+
+============================================================================
+
+MILESTONE 5: v0.5 - Plugins [Story Points: 21]
+-----------------------------------------------
+Goal: Plugin architecture and extensibility
+Target: Sprint 9-10
+
+Deliverables:
+- Plugin trait system design
+- Configuration file support (~/.config/rolo/)
+- CSV/JSON input plugins
+- Markdown table output plugin
+- Theme plugin interface
+
+Success Criteria:
+- Plugins can be enabled via Cargo features
+- Configuration file properly loaded
+- At least 2 plugins fully functional
+- Plugin development guide written
+
+============================================================================
+
+MILESTONE 6: v1.0 - Production [Story Points: 8]
+-------------------------------------------------
+Goal: Production-ready release
+Target: Sprint 11-12
+
+Deliverables:
+- Performance optimizations
+- Complete documentation
+- CI/CD pipeline setup
+- Cargo package published
+- Integration with paintbox project
+
+Success Criteria:
+- Handles 10k+ lines/sec
+- Zero panics in normal operation
+- Published to crates.io
+- Used in real workflows
+
+============================================================================
+
+FUTURE CONSIDERATIONS (Post v1.0)
+----------------------------------
+- Advanced Unix heritage features (pr pagination, paste merge modes)
+- Interactive mode with TUI
+- Network streaming support
+- Custom DSL for layout definitions
+- Integration with more oodx tools
+
+RISK MITIGATION
+---------------
+- Width calculation complexity → Use proven boxy implementation
+- Performance bottlenecks → Profile early and often
+- RSB learning curve → Reference existing boxy/jynx implementations
+- Feature creep → Maintain focus on MVP core modes
+
+NOTES
+-----
+- Iterative releases every 2 sprints
+- Each milestone should be shippable
+- Prioritize correctness over features
+- Keep UX simple and intuitive

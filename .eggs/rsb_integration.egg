@@ -1,0 +1,74 @@
+🐔 CHINA'S RSB INTEGRATION EGG #2 🥚
+================================================================================
+RSB FRAMEWORK PATTERNS FOR ROLO
+Date: 2025-09-15
+Agent: China the Summary Chicken
+
+🔍 EXECUTIVE SUMMARY
+-------------------
+Rolo's RSB integration focuses on creating a modular, performant text layout engine with clear separation of concerns and extensible design.
+
+🏗️ RSB MODULE STRUCTURE
+-----------------------
+1. Core Modules:
+   - Width: ANSI/Unicode width calculation
+   - Layout: Column and table formatting
+   - Stream: Input processing and buffering
+   - Theme: Visual styling and presentation
+
+2. REBEL Philosophy Application:
+   - Reusable: Modular components
+   - Extensible: Plugin-style theme and layout systems
+   - Bridging: Seamless pipe integration
+   - Efficient: High-performance streaming
+   - Lightweight: Minimal runtime overhead
+
+3. Recommended Module Architecture:
+   ```
+   rolo/
+   ├── src/
+   │   ├── core/
+   │   │   ├── width.rs      # Width calculation
+   │   │   ├── layout.rs     # Formatting logic
+   │   │   └── stream.rs     # Stream processing
+   │   ├── themes/           # Theming system
+   │   │   ├── mod.rs
+   │   │   ├── plain.rs
+   │   │   └── guide.rs
+   │   └── cli.rs            # CLI argument parsing
+   ```
+
+🎯 KEY RSB PATTERN ADOPTIONS
+----------------------------
+1. Composition over Inheritance
+   - Use traits for width calculation
+   - Pluggable theme and layout strategies
+
+2. Functional Core, Imperative Shell
+   - Pure width/layout functions
+   - Impure CLI and I/O at edges
+
+3. Performance Considerations
+   - Zero-copy stream processing
+   - Lazy evaluation of layouts
+   - Minimal allocations
+
+🚧 IMPLEMENTATION RECOMMENDATIONS
+---------------------------------
+- Use Rust's type system for safety
+- Leverage traits for extensibility
+- Implement comprehensive test suite
+- Benchmark each module independently
+
+❓ OPEN DESIGN CONSIDERATIONS
+-----------------------------
+- Theme system complexity
+- Performance vs. flexibility trade-offs
+- Extensibility of layout algorithms
+
+🚨 DISCLAIMER
+-------------
+Recommendations based on current project understanding. Actual implementation may require adjustments.
+
+================================================================================
+🐔 Egg laid by China - RSB Integration Specialist! 🥚
