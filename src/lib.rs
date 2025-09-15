@@ -14,14 +14,20 @@ pub mod width;
 
 /// Prelude with curated exports per MODULE_SPEC
 pub mod prelude {
-    // Core functionality
+    // Layout functionality
     pub use crate::layout::{format_columns, format_table, format_list, LayoutConfig};
-    pub use crate::width::{get_display_width, get_terminal_width};
+
+    // Width calculation functionality
+    pub use crate::width::{get_display_width, get_terminal_width, validate_width};
+
+    // Error types for comprehensive error handling
+    pub use crate::width::error::WidthError;
+    pub use crate::layout::error::LayoutError;
 
     // Module-owned macros
     pub use crate::layout_config;
 
-    // TODO: Add more exports as modules are implemented
+    // TODO: Add CLI and Stream modules as they are implemented
 }
 
 // Re-export prelude at crate root for convenience
