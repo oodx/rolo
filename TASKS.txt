@@ -124,7 +124,7 @@ Total Points: 21
     - ANSI-aware width calculation using boxy adapter
     - Gap spacing and width constraints implemented
     - Proper error handling for edge cases
-    Acceptance: echo "a b c d" | rolo --cols 2 works
+    Acceptance: echo -e "a\nb\nc\nd" | rolo --cols 2 works (produces 2 columns)
     Tests: 11 comprehensive column mode tests added to baseline
 
 [5] TASK-008: Table Mode Implementation
