@@ -20,23 +20,28 @@ v1.0 - Production (Sprint 11-12)
 
 ============================================================================
 
-MILESTONE 1: v0.1 - Foundation [Story Points: 13]
+MILESTONE 1: v0.1 - Foundation [Story Points: 15]
 --------------------------------------------------
-Goal: RSB setup, width calculation, basic streaming
+Goal: RSB setup with MODULE_SPEC compliance, width calculation, basic streaming
 Target: Sprint 1-2
 
 Deliverables:
 - RSB framework integration complete
-- Boxy width_plugin integrated and tested
+- MODULE_SPEC compliant module structure
+- Boxy width_plugin via adapter pattern
 - Basic CLI with RSB Args/dispatch
 - Streaming stdin/stdout pipeline
-- Project structure following RSB MODULE_SPEC
+- Prelude with curated exports
+- Error handling per module
 
 Success Criteria:
+- All modules follow MODULE_SPEC structure (mod.rs, utils.rs, helpers.rs, error.rs)
+- Width adapter with feature flags and fallbacks
 - Can read from stdin and write to stdout
 - Correctly calculates display width for ANSI/Unicode text
 - RSB patterns properly implemented
 - Dual library/cli mode working
+- Baseline tests pass without features
 
 ============================================================================
 

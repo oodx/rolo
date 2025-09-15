@@ -5,85 +5,104 @@ Sprint Velocity Target: 5-8 points
 
 ============================================================================
 SPRINT 1-2: FOUNDATION (v0.1)
-Total Points: 13
+Total Points: 15
 ============================================================================
 
-[3] TASK-001: Setup RSB Project Structure
+[3] TASK-001: Setup RSB Project with MODULE_SPEC Structure
     - Initialize Cargo project with RSB dependency
-    - Create module structure per MODULE_SPEC
-    - Setup dual library/cli mode
+    - Create MODULE_SPEC compliant directories:
+      * layout/ (mod.rs, utils.rs, helpers.rs, error.rs, macros.rs)
+      * stream/ (mod.rs, utils.rs, helpers.rs, error.rs)
+      * width/ (mod.rs, utils.rs, error.rs, width_boxy_adapter.rs)
+      * cli/ (mod.rs, args.rs, dispatch.rs, error.rs)
+      * theme/ (mod.rs, utils.rs, macros.rs)
+    - Setup lib.rs with prelude exports
+    - Setup main.rs for CLI entry
     - Configure rust-toolchain.toml
-    Acceptance: Project compiles with RSB, follows MODULE_SPEC
+    Acceptance: Project structure matches MODULE_SPEC exactly
 
-[2] TASK-002: Import Boxy Width Plugin
-    - Copy width_plugin.rs from boxy
+[3] TASK-002: Implement Width Module with Boxy Adapter
+    - Copy width calculation logic from boxy
+    - Create width_boxy_adapter.rs with feature gates
+    - Implement fallback for when boxy feature is disabled
     - Add required dependencies (strip_ansi_escapes, unicode-width)
-    - Create wrapper module in plugins/width.rs
-    - Write unit tests for width calculation
-    Acceptance: get_display_width() works with ANSI/Unicode
+    - Create width/error.rs with typed errors
+    - Write unit tests for both feature states
+    Acceptance: Width calculation works with and without boxy feature
 
-[3] TASK-003: Implement RSB CLI Bootstrap
-    - Setup Args struct with RSB patterns
-    - Implement dispatch! for subcommands
-    - Add --help, --version flags
-    - Create basic error handling with validate!
-    Acceptance: CLI responds to basic commands
+[2] TASK-003: Setup Prelude and Module Exports
+    - Create prelude.rs with curated exports
+    - Setup module orchestrators (mod.rs files)
+    - Ensure no business logic in orchestrators
+    - Export module-owned macros properly
+    - Follow prelude policy (no optional features)
+    Acceptance: Clean public API surface, imports work
 
-[2] TASK-004: Basic Stream Processing
-    - Implement stdin reader with buffering
-    - Setup stdout writer
-    - Create stream.rs module
-    - Handle EOF and pipe breaks
+[3] TASK-004: Implement CLI Module with RSB Patterns
+    - Create cli/args.rs with RSB Args struct
+    - Implement cli/dispatch.rs with dispatch! macro
+    - Setup cli/error.rs for CLI errors
+    - Add --help, --version, --width subcommands
+    - Use validate! for error handling
+    Acceptance: CLI responds to commands with proper error handling
+
+[2] TASK-005: Stream Module Implementation
+    - Create stream/utils.rs with buffered reading
+    - Implement stream/helpers.rs for internal logic
+    - Setup stream/error.rs for stream errors
+    - Handle stdin/stdout properly
+    - Support pipe breaks and EOF
     Acceptance: Can pipe text through rolo
 
-[3] TASK-005: Project Infrastructure
-    - Setup GitHub Actions CI
-    - Create test harness structure
-    - Add Makefile/justfile for common tasks
-    - Initialize documentation structure
-    Acceptance: CI runs, tests pass
+[2] TASK-006: Feature Flags and Testing Setup
+    - Configure Cargo.toml features per MODULE_SPEC
+    - Create baseline tests without features
+    - Add feature-gated tests for adapters
+    - Setup test structure per module
+    - Use utils::stderrx for non-visual logging
+    Acceptance: Tests pass in both default and feature modes
 
 ============================================================================
 SPRINT 3-4: CORE MODES (v0.2)
 Total Points: 21
 ============================================================================
 
-[5] TASK-006: Column Mode Implementation
+[5] TASK-007: Column Mode Implementation
     - Parse --cols N argument
     - Implement column layout algorithm
     - Handle ANSI-aware width padding
     - Add --gap option for spacing
     Acceptance: echo "a b c d" | rolo --cols 2 works
 
-[5] TASK-007: Table Mode Implementation
+[5] TASK-008: Table Mode Implementation
     - Parse --table flag
     - Auto-detect column widths
     - Implement --delim for parsing
     - Handle row overflow
     Acceptance: cat data.tsv | rolo --table works
 
-[3] TASK-008: List Mode Implementation
+[3] TASK-009: List Mode Implementation
     - Single column formatting
     - Optional line numbers
     - Alignment options (left, right, center)
     - Width constraints
     Acceptance: ls | rolo --list works
 
-[3] TASK-009: Terminal Width Detection
+[3] TASK-010: Terminal Width Detection
     - Integrate RSB host module for $COLUMNS
     - Implement --width override
     - Add --fit mode (default)
     - Handle terminal resize
     Acceptance: Respects terminal width
 
-[3] TASK-010: Separator Support
+[3] TASK-011: Separator Support
     - Implement --sep for input splitting
     - Add regex separator support
     - Handle multi-character separators
     - Test with various delimiters
     Acceptance: Can split on custom separators
 
-[2] TASK-011: Mode Integration Tests
+[2] TASK-012: Mode Integration Tests
     - Create test fixtures for each mode
     - Pipeline tests with sample data
     - Edge case testing
@@ -95,28 +114,28 @@ SPRINT 5-6: INTEGRATION (v0.3)
 Total Points: 13
 ============================================================================
 
-[3] TASK-012: TokenStream Support
+[3] TASK-013: TokenStream Support
     - Study RSB tokens module
     - Implement TokenStream parser
     - Add --tokens input mode
     - Create token to table/column converter
     Acceptance: Can process RSB TokenStreams
 
-[5] TASK-013: Pipeline Integration Tests
+[5] TASK-014: Pipeline Integration Tests
     - Create jynx → rolo tests
     - Create rolo → boxy tests
     - Full pipeline jynx → rolo → boxy tests
     - Document common patterns
     Acceptance: Works in ecosystem pipelines
 
-[2] TASK-014: Performance Benchmarking
+[2] TASK-015: Performance Benchmarking
     - Setup criterion benchmarks
     - Benchmark each mode
     - Profile memory usage
     - Identify bottlenecks
     Acceptance: Baseline metrics established
 
-[3] TASK-015: Documentation Sprint
+[3] TASK-016: Documentation Sprint
     - Write comprehensive README
     - Create examples/ directory
     - Document each mode with examples
@@ -128,35 +147,35 @@ SPRINT 7-8: POLISH (v0.4)
 Total Points: 13
 ============================================================================
 
-[3] TASK-016: Advanced Alignment Options
+[3] TASK-017: Advanced Alignment Options
     - Per-column alignment (--align L,C,R)
     - Padding control (--pad)
     - Header row support (--headers)
     - Footer row support
     Acceptance: Fine-grained layout control
 
-[3] TASK-017: Border Styles
+[3] TASK-018: Border Styles
     - Implement --border none|ascii|unicode
     - Line drawing characters
     - Corner handling
     - Color support for borders
     Acceptance: Tables can have borders
 
-[2] TASK-018: Truncation Policies
+[2] TASK-019: Truncation Policies
     - Implement --truncate with ellipsis
     - Add --wrap for line wrapping
     - Smart truncation (word boundaries)
     - Per-column truncation
     Acceptance: Long content handled gracefully
 
-[3] TASK-019: Error Handling Enhancement
+[3] TASK-020: Error Handling Enhancement
     - Improve error messages
     - Add --verbose debugging
     - Handle malformed input gracefully
     - Recovery strategies
     Acceptance: Clear, helpful error messages
 
-[2] TASK-020: Test Coverage Push
+[2] TASK-021: Test Coverage Push
     - Achieve 80% code coverage
     - Add property-based tests
     - Fuzz testing for parsers
@@ -168,42 +187,42 @@ SPRINT 9-10: PLUGINS (v0.5)
 Total Points: 21
 ============================================================================
 
-[5] TASK-021: Plugin Architecture
+[5] TASK-022: Plugin Architecture
     - Design RoloPlugin trait
     - Implement plugin registry
     - Create plugin lifecycle hooks
     - Configuration loading system
     Acceptance: Plugin system functional
 
-[3] TASK-022: CSV Plugin
+[3] TASK-023: CSV Plugin
     - CSV parsing with configurable options
     - Header detection
     - Quote handling
     - Type inference
     Acceptance: CSV files render as tables
 
-[3] TASK-023: JSON Plugin
+[3] TASK-024: JSON Plugin
     - JSON parsing and flattening
     - Nested object handling
     - Array formatting
     - Pretty printing options
     Acceptance: JSON data displays structured
 
-[3] TASK-024: Markdown Plugin
+[3] TASK-025: Markdown Plugin
     - Generate markdown tables
     - GitHub-flavored markdown
     - Alignment syntax
     - Escape special characters
     Acceptance: Output valid markdown tables
 
-[5] TASK-025: Configuration System
+[5] TASK-026: Configuration System
     - Parse ~/.config/rolo/config.toml
     - Environment variable overrides
     - Default configurations
     - Config validation
     Acceptance: Configuration affects behavior
 
-[2] TASK-026: Plugin Documentation
+[2] TASK-027: Plugin Documentation
     - Plugin development guide
     - Example plugin implementation
     - API documentation
@@ -215,28 +234,28 @@ SPRINT 11-12: PRODUCTION (v1.0)
 Total Points: 8
 ============================================================================
 
-[3] TASK-027: Performance Optimization
+[3] TASK-028: Performance Optimization
     - Zero-copy where possible
     - Optimize hot paths
     - Reduce allocations
     - Parallel processing exploration
     Acceptance: Handles 10k+ lines/sec
 
-[2] TASK-028: Release Preparation
+[2] TASK-029: Release Preparation
     - Cargo.toml metadata
     - License selection
     - CHANGELOG.md
     - Security policy
     Acceptance: Ready for crates.io
 
-[1] TASK-029: CI/CD Enhancement
+[1] TASK-030: CI/CD Enhancement
     - Release automation
     - Binary builds for platforms
     - Documentation generation
     - Badge setup
     Acceptance: Automated releases work
 
-[2] TASK-030: Paintbox Integration
+[2] TASK-031: Paintbox Integration
     - Coordinate with paintbox project
     - Shared component extraction
     - Version synchronization
