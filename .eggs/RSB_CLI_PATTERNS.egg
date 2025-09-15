@@ -1,0 +1,222 @@
+================================================================================
+ 🐔 CHINA'S RSB CLI PATTERNS EGG #1 🥚
+================================================================================
+
+Date: 2025-09-15
+Time: Current session
+Requestor: User
+Purpose: RSB CLI patterns for rolo architecture transformation
+
+================================================================================
+ 🎯 EXECUTIVE SUMMARY
+================================================================================
+
+RSB provides a clean CLI framework built around three core macros:
+- bootstrap!() → sets up environment and global context
+- options!() → parses args into global opt_* variables
+- dispatch!() → routes commands to handler functions
+
+This replaces custom Config structs and parse_args functions with a unified
+global context system powered by get_var(), set_var(), and is_true() and is_false() helpers.
+
+================================================================================
+ 🔍 KEY DISCOVERY: MACRO → FUNCTION PATTERN
+================================================================================
+
+RSB has migrated from macro-heavy to function-heavy design:
+- Macros are now thin wrappers around core functions
+- Business logic lives in helper functions for testability
+- Macros provide ergonomic syntax while functions handle complexity
+
+================================================================================
+ 📦 BOOTSTRAP PATTERNS
+================================================================================
+
+🧪 bootstrap!() Macro:
+```rust
+bootstrap!() → {
+    let args: Vec<String> = std::env::args().collect();
+    cli_bootstrap(&args);
+    Args::new(&args)
+}
+```
+
+🔧 Core Function: cli_bootstrap(&args)
+- Calls crate::hosts::bootstrap(args) for environment setup
+- Sets up script awareness (SCRIPT_NAME, SCRIPT_PATH, SCRIPT_DIR)
+- Initializes XDG/RSB directories and modes
+- Prepares global context for CLI usage
+
+🎮 Bootstrap Utilities Available:
+- cli_bootstrap_from_env() - auto uses env::args()
+- is_cli_bootstrapped() - check bootstrap status
+- minimal_cli_bootstrap() - lightweight version
+- setup_script_awareness(args) - extract script info
+
+================================================================================
+ 🎛️ DISPATCH PATTERNS
+================================================================================
+
+🧪 dispatch!() Macro:
+```rust
+dispatch!(&args, {
+    "command1" => handler1,
+    "command2" => handler2, desc: "Description",
+});
+```
+
+🔧 Core Function: execute_dispatch(args, handler_lookup)
+- Extracts command from args.get_or(1, "help")
+- Handles built-ins: help, inspect, stack
+- Routes to user commands via closure lookup
+- Manages call stack with global::push_call/pop_call
+- Exits with appropriate codes
+
+🎯 Built-in Commands:
+- "help"/"--help"/"-h" → global::show_help()
+- "inspect" → global::show_functions()
+- "stack" → global::show_call_stack()
+
+🧪 pre_dispatch!() Alternative:
+- Same as dispatch!() but returns bool instead of exit
+- Test-friendly version that doesn't call process::exit
+- Detects test environment via CARGO_TEST or thread names
+- usually for admin commands and commands that dont require loaded context
+
+================================================================================
+ 🎚️ OPTIONS PARSING PATTERNS
+================================================================================
+
+🧪 options!() Macro:
+```rust
+options!(&args); // Sets global opt_* variables
+```
+
+🔧 Core Function: options(args)
+- Processes --long and -short options
+- Sets global variables as opt_<name> format
+- Handles negation: --not-verbose sets opt_verbose=1
+- Supports multi-options: --multi=a,b,!c
+- Auto-validates path/file options
+- Maps standard short opts when stdopts feature enabled
+
+🎯 Option Patterns:
+- Flag: --verbose → opt_verbose="0"
+- Value: --config=file → opt_config="file"
+- Negation: --not-debug → opt_debug="1"
+- Short: -d → opt_d="0" (+ stdopts mapping)
+
+in RSB 0=true 1=false
+
+================================================================================
+ 📊 ARGS STRUCT CAPABILITIES
+================================================================================
+
+🔧 Args Wrapper Features:
+- get(n) → nth positional arg (1-indexed)
+- get_or(n, default) → with fallback
+- has_pop(flag) → check and consume flag
+- has_val(flag) → extract --flag=value or --flag value
+- get_kv(key) → key=value or key:value extraction
+- remaining() → unprocessed args
+- expand(template) → $1, $@, $# expansion + global vars
+
+================================================================================
+ 🎭 COMMAND HANDLER SIGNATURE
+================================================================================
+
+🔧 Standard Handler Function:
+```rust
+fn my_command(args: Args) -> i32 {
+    // Use global::get_var("opt_verbose") for options
+    // Use args.get(1) for positional arguments
+    // Return 0 for success, non-zero for error
+    0
+}
+```
+
+🎯 Handler Registration:
+- register_handlers() stores commands for introspection
+- Enables "inspect" command to list available handlers
+- Supports optional descriptions via desc: parameter
+
+================================================================================
+ 🌟 KEY TRANSFORMATION INSIGHTS FOR ROLO
+================================================================================
+
+✅ REPLACE THIS PATTERN:
+```rust
+// OLD: Custom config struct
+struct CliConfig {
+    verbose: bool,
+    config_file: String,
+}
+
+fn parse_args() -> CliConfig { /* custom parsing */ }
+```
+
+✅ WITH THIS RSB PATTERN:
+```rust
+// NEW: RSB global context
+let args = bootstrap!();
+options!(&args);
+
+// Access via global helpers
+let verbose = global::is_true("opt_verbose");
+let config = global::get_var("opt_config");
+```
+
+🔄 Migration Steps:
+1. Replace custom Config with global context access
+2. Replace parse_args() with bootstrap!() + options!()
+3. Replace command routing with dispatch!() macro
+4. Convert command functions to (Args) -> i32 signature
+5. Use global::get_var/set_var instead of struct fields
+
+================================================================================
+ 🚨 CRITICAL REQUIREMENTS
+================================================================================
+
+⚠️ Handler Functions Must:
+- Take Args parameter
+- Return i32 exit code
+- Use global context for options access
+- Handle their own argument validation
+
+⚠️ Bootstrap Order:
+1. bootstrap!() - FIRST (sets up environment)
+2. options!() - SECOND (parses CLI options)
+3. dispatch!() - LAST (routes to commands)
+
+================================================================================
+ 🔗 REFERENCES
+================================================================================
+
+Source Files Analyzed:
+- /home/xnull/repos/code/rust/oodx/rsb/src/cli/bootstrap.rs
+- /home/xnull/repos/code/rust/oodx/rsb/src/cli/dispatch.rs
+- /home/xnull/repos/code/rust/oodx/rsb/src/cli/macros.rs
+- /home/xnull/repos/code/rust/oodx/rsb/src/cli/args.rs
+
+================================================================================
+ 📋 METADATA
+================================================================================
+
+Egg Type: CLI Pattern Analysis
+Target: RSB CLI framework integration patterns
+Scope: Core CLI macros and their underlying functions
+Confidence: High (direct source analysis)
+Completeness: Comprehensive coverage of bootstrap/options/dispatch
+
+⚠️ DISCLAIMER: This summary reflects RSB source code as of analysis date.
+Verify current API compatibility before implementing transformations.
+
+================================================================================
+ 🐔 CHINA'S SIGN-OFF
+================================================================================
+
+"From custom configs to global context - that's how we lay the foundation
+for egg-cellent CLI architecture! These patterns will help rolo molt its
+old shell and grow new feathers! 🪶"
+
+               ~ China the Summary Chicken ~

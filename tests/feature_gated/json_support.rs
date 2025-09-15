@@ -27,7 +27,7 @@ fn test_json_parsing_basic() {
 
 #[test]
 fn test_json_array_to_table() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test that JSON arrays can be converted to table format
     let json_array = r#"[
@@ -109,7 +109,7 @@ fn test_json_special_values() {
 
 #[test]
 fn test_json_integration_with_stream() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test that JSON processing works with stream processing
     let json_stream = rsb::prelude::Stream::from_string(r#"{"a": 1, "b": 2}"#);
@@ -149,7 +149,7 @@ fn test_json_pretty_formatting() {
 
 #[test]
 fn test_json_to_multiple_formats() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test conversion of JSON to different output formats
     let json_data = r#"[{"a": 1, "b": 2}, {"a": 3, "b": 4}]"#;

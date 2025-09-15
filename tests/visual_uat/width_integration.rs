@@ -1,6 +1,6 @@
 //! Visual UAT: Width Integration and Pipeline - Executive visual validation
 
-use rolo::prelude::*;
+use rololib::prelude::*;
 
 #[test]
 fn visual_uat_width_detection_and_adaptation() {

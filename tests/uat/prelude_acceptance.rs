@@ -6,7 +6,7 @@ fn uat_prelude_single_import_usability() {
     println!("Validating that single import provides complete functionality...");
 
     // Executive requirement: One import should provide everything needed
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // All major function categories should be accessible
     let _width_fn = get_display_width;
@@ -35,7 +35,7 @@ fn uat_api_consistency_and_ergonomics() {
     println!("=== UAT: API Consistency and Ergonomics ===");
     println!("Validating API design meets usability standards...");
 
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Executive requirement: Common workflows should be straightforward
 
@@ -80,7 +80,7 @@ fn uat_macro_flexibility() {
     println!("=== UAT: Configuration Macro Flexibility ===");
     println!("Validating configuration macro meets various use cases...");
 
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Executive requirement: Configuration should be flexible and intuitive
 

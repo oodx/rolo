@@ -13,7 +13,7 @@ fn test_project_compiles() {
     println!("✅ Width module accessible");
 
     // Test prelude imports
-    use rolo::prelude::*;
+    use rololib::prelude::*;
     let _config = LayoutConfig::default();
     println!("✅ Prelude imports work");
 
@@ -39,9 +39,10 @@ fn test_module_structure_compliance() {
     let _result = rolo::width::utils::get_display_width("test");
     println!("✅ Width utilities accessible");
 
-    // Test CLI utilities accessible
-    let _cli_config = rolo::cli::CliConfig::default();
-    println!("✅ CLI utilities accessible");
+    // Test RSB global context
+    rsb::prelude::set_var("test", "value");
+    assert_eq!(rsb::prelude::get_var("test"), "value");
+    println!("✅ RSB global context accessible");
 
     println!("✅ MODULE_SPEC compliance verified!");
 }
@@ -52,7 +53,7 @@ fn test_feature_flags_default() {
     println!("Testing that default build works without optional features...");
 
     // This should work without any features enabled
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     let config = LayoutConfig::default();
     println!("Default layout config: width={}, gap={}, padding={}",
@@ -61,9 +62,9 @@ fn test_feature_flags_default() {
     let term_width = get_terminal_width();
     println!("Terminal width: {}", term_width);
 
-    // Macro test
-    let _custom_config = layout_config!(100);
-    println!("✅ Layout config macro works");
+    // Test RSB integration
+    let _stream = rsb::prelude::Stream::from_string("test");
+    println!("✅ RSB integration works");
 
     println!("✅ Default feature flags test passed!");
 }

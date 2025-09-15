@@ -3,7 +3,7 @@
 //! Executive-level visual acceptance tests for column formatting functionality.
 //! These tests demonstrate actual visual output for stakeholder validation.
 
-use rolo::prelude::*;
+use rololib::prelude::*;
 
 #[test]
 fn test_visual_column_mode_basic_layout() {

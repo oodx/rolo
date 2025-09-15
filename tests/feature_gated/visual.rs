@@ -14,7 +14,7 @@ fn test_visual_feature_available() {
 
 #[test]
 fn test_visual_mode_compatibility() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test that visual mode works with layout operations
     let result = format_columns("test\ndata", 2);
@@ -29,7 +29,7 @@ fn test_visual_mode_compatibility() {
 
 #[test]
 fn test_visual_config_compatibility() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test that visual features don't break basic config
     let config = LayoutConfig::default();
@@ -43,7 +43,7 @@ fn test_visual_config_compatibility() {
 #[test]
 fn test_visual_output_structure() {
     // Test that visual output maintains proper structure
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // When visual features are enabled, output should still be well-structured
     let input = "line1\nline2\nline3";
@@ -60,7 +60,7 @@ fn test_visual_output_structure() {
 
 #[test]
 fn test_visual_error_handling() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test that visual features don't break error handling
     let result = format_columns("test", 0); // Invalid column count

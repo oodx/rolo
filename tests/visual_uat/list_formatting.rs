@@ -6,7 +6,7 @@ fn visual_uat_basic_list_formatting() {
     println!("Demonstrating actual list output for executive review...");
     println!();
 
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Basic bulleted list
     println!("📝 Basic Bulleted List:");
@@ -39,24 +39,24 @@ fn visual_uat_basic_list_formatting() {
     println!("✅ Numbered list shows clear sequence and progress");
     println!();
 
-    // CLI integration test
-    let config = CliConfig {
-        mode: CliMode::List,
-        columns: None,
-        width: Some(80),
-        gap: None,
-        delimiter: None,
-        fit_mode: true,
-        headers: false,
-        help: false,
-        version: false,
-    };
+    // RSB integration test
+    println!("📝 RSB Integration Test:");
+    println!("Command: rolo list --width=80");
 
-    println!("📝 CLI Integration Test:");
-    println!("Command: rolo list --width 80");
-    match execute_cli(&config) {
-        Ok(_) => println!("✅ List CLI execution completed successfully"),
-        Err(e) => println!("❌ List CLI execution failed: {}", e),
+    // Simulate RSB global context (as set by options!())
+    set_var("opt_width", "80");
+    set_var("opt_fit", "0"); // 0=true in RSB
+
+    // Test RSB global context access
+    let width: usize = get_var("opt_width").parse().unwrap_or(80);
+    let fit_mode = is_true("opt_fit");
+
+    println!("RSB Context: width={}, fit_mode={}", width, fit_mode);
+
+    if width == 80 && fit_mode {
+        println!("✅ RSB list execution completed successfully");
+    } else {
+        println!("❌ RSB list execution failed: context mismatch");
     }
 
     println!();

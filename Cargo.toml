@@ -14,7 +14,7 @@ name = "rolo"
 path = "src/main.rs"
 
 [lib]
-name = "rolo"
+name = "rololib"
 path = "src/lib.rs"
 
 [dependencies]

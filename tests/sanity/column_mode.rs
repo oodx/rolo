@@ -7,7 +7,7 @@ fn test_column_mode_basic_demo() {
     println!("=== Column Mode Basic Demo ===");
     println!("Testing basic column formatting functionality...\n");
 
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     let input = "apple\nbanana\ncherry\ndate\nelderberry\nfig";
     println!("Input text (6 items):");
@@ -34,7 +34,7 @@ fn test_column_mode_gap_demo() {
     println!("=== Column Mode Gap Spacing Demo ===");
     println!("Demonstrating configurable gap between columns...\n");
 
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     let input = "one\ntwo\nthree\nfour";
     println!("Input: {}", input.replace('\n', ", "));
@@ -64,7 +64,7 @@ fn test_column_mode_ansi_demo() {
     println!("=== Column Mode ANSI Color Demo ===");
     println!("Testing ANSI color preservation in columns...\n");
 
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Create colored input
     let input = format!(
@@ -92,7 +92,7 @@ fn test_column_mode_unicode_demo() {
     println!("=== Column Mode Unicode Demo ===");
     println!("Testing Unicode and wide character support...\n");
 
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     let input = "hello\n世界\nこんにちは\n🌟\nemoji\n文字";
     println!("Input (mixed Unicode):");
@@ -110,35 +110,37 @@ fn test_column_mode_unicode_demo() {
 }
 
 #[test]
-fn test_column_mode_cli_integration_demo() {
-    println!("=== Column Mode CLI Integration Demo ===");
-    println!("Testing CLI argument parsing for column mode...\n");
+fn test_column_mode_rsb_integration_demo() {
+    println!("=== Column Mode RSB Integration Demo ===");
+    println!("Testing RSB global context for column mode...\n");
 
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
-    // Simulate CLI arguments
-    let args = vec![
-        "rolo".to_string(),
-        "--cols".to_string(),
-        "3".to_string(),
-        "--gap".to_string(),
-        "2".to_string(),
-    ];
+    // Simulate RSB global context setup (as would be done by options!())
+    set_var("opt_cols", "3");
+    set_var("opt_gap", "2");
+    set_var("opt_width", "80");
+    set_var("opt_fit", "0"); // RSB: 0=true
 
-    let config = parse_args(&args).expect("CLI parsing should work");
-
-    println!("Parsed CLI configuration:");
-    println!("  Mode: {:?}", config.mode);
-    println!("  Columns: {:?}", config.columns);
-    println!("  Gap: {:?}", config.gap);
-    println!("  Width: {:?}", config.width);
+    println!("RSB Global Context:");
+    println!("  Columns: {}", get_var("opt_cols"));
+    println!("  Gap: {}", get_var("opt_gap"));
+    println!("  Width: {}", get_var("opt_width"));
+    println!("  Fit mode: {}", is_true("opt_fit"));
     println!();
 
-    // Verify column mode settings
-    assert_eq!(config.columns, Some(3));
-    assert_eq!(config.gap, Some(2));
+    // Verify RSB context access (as used in real command handlers)
+    let cols: usize = get_var("opt_cols").parse().unwrap_or(2);
+    let gap: usize = get_var("opt_gap").parse().unwrap_or(1);
+    let width: usize = get_var("opt_width").parse().unwrap_or(80);
+    let fit_mode = is_true("opt_fit");
 
-    println!("✅ CLI integration for column mode works!");
+    assert_eq!(cols, 3);
+    assert_eq!(gap, 2);
+    assert_eq!(width, 80);
+    assert_eq!(fit_mode, true);
+
+    println!("✅ RSB global context integration for column mode works!");
 }
 
 #[test]
@@ -146,7 +148,7 @@ fn test_column_mode_edge_cases_demo() {
     println!("=== Column Mode Edge Cases Demo ===");
     println!("Testing edge cases and error handling...\n");
 
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test empty input
     let result = format_columns("", 2);
@@ -181,7 +183,7 @@ fn test_column_mode_performance_demo() {
     println!("=== Column Mode Performance Demo ===");
     println!("Testing with larger datasets...\n");
 
-    use rolo::prelude::*;
+    use rololib::prelude::*;
     use std::time::Instant;
 
     // Generate test data

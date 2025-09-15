@@ -29,7 +29,7 @@ fn test_csv_parsing_basic() {
 
 #[test]
 fn test_csv_to_table_conversion() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test that CSV data can be converted to table format
     let csv_data = "col1,col2,col3\nval1,val2,val3\nval4,val5,val6";
@@ -79,7 +79,7 @@ fn test_csv_special_cases() {
 
 #[test]
 fn test_csv_integration_with_stream() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test that CSV processing works with stream processing
     let csv_stream = rsb::prelude::Stream::from_string("a,b,c\n1,2,3\n4,5,6");

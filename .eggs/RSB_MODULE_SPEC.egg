@@ -1,0 +1,320 @@
+================================================================================
+ 🐔 CHINA'S RSB MODULE SPEC EGG #3 🥚
+================================================================================
+
+Date: 2025-09-15
+Time: Current session
+Requestor: User
+Purpose: RSB MODULE_SPEC compliance for proper rolo architecture
+
+================================================================================
+ 🎯 EXECUTIVE SUMMARY
+================================================================================
+
+RSB MODULE_SPEC defines a strict organization pattern for Rust modules:
+- mod.rs orchestrates and re-exports (NO business logic)
+- utils.rs contains curated low-level helpers users opt into
+- helpers.rs holds internal implementations
+- macros.rs owns module-specific macros
+- Cross-module integrations use adapter pattern to avoid circular deps
+
+================================================================================
+ 🔍 CRITICAL DISCOVERY: MODULE LAYOUT ENFORCEMENT
+================================================================================
+
+RSB enforces SINGLE SOURCE OF TRUTH per module with specific file roles:
+
+📁 MODULE STRUCTURE:
+```
+<module>/
+├── mod.rs       ← Orchestrator & re-exports (curated public surface)
+├── utils.rs     ← Curated low-level helpers ("utils" namespace)
+├── helpers.rs   ← Internal implementations (consumed by utils/orchestrator)
+├── macros.rs    ← Module-owned macros (value + var forms)
+└── error.rs     ← Typed error enums for consistent messaging
+```
+
+⚠️ CRITICAL RULE: mod.rs owns public surface, NO business logic allowed!
+
+================================================================================
+ 🎛️ PRELUDE POLICY COMPLIANCE
+================================================================================
+
+🔧 Prelude Re-export Rules:
+- Re-export user-facing items and module-owned macros via rsb::prelude::*
+- DO NOT re-export internal submodules unless intentionally public/stable
+- Optional/visual features MUST NOT leak into prelude
+- Tests may import modules/macros directly as needed
+
+🎯 Feature Flag Architecture:
+```toml
+[features]
+default = []
+
+# Visual base and components
+visual = []
+colors-simple = ["visual"]
+colors-named  = ["visual", "colors-simple"]
+colors-status = ["visual"]
+glyphs = ["visual"]
+prompts = ["visual", "colors-simple"]
+
+# Umbrellas and convenience
+colors  = ["visual", "colors-simple"]
+visuals = ["visual", "colors-simple", "colors-named", "colors-status", "glyphs", "prompts"]
+
+# Options helpers
+stdopts = []
+```
+
+================================================================================
+ 🧩 CROSS-MODULE INTEGRATION PATTERN
+================================================================================
+
+🔧 Adapter Pattern for Dependencies:
+- Goal: Reuse helpers across modules WITHOUT circular dependencies
+- Location: Consumer module only, in dedicated file
+- Naming: `<module>_<dep>_adapter.rs` or `<module>_<dep>_shared.rs`
+
+🧪 Adapter Template Example:
+```rust
+// math/math_string_adapter.rs
+#[cfg(feature = "string")]
+pub fn parse_num_list(s: &str) -> Vec<f64> {
+    // Reuse string helpers to split/sanitize
+    rsb::string::utils::filter_ascii_strip(s)
+        .split(',')
+        .filter_map(|t| t.trim().parse::<f64>().ok())
+        .collect()
+}
+
+#[cfg(not(feature = "string"))]
+pub fn parse_num_list(_s: &str) -> Vec<f64> {
+    Vec::new() // safe fallback
+}
+```
+
+🎯 Adapter Integration in mod.rs:
+```rust
+#[cfg(feature = "string")]
+pub use self::math_string_adapter::parse_num_list;
+```
+
+================================================================================
+ ⚡ MACRO DESIGN PRINCIPLES
+================================================================================
+
+🔧 Macro Guidelines:
+- Keep macros THIN; delegate logic to helper functions
+- Prefer value + var forms for string-oriented macros:
+  * Value form: consumes provided value (e.g., snake!(s))
+  * Var form: fetches from Context first (e.g., snake_var!("NAME"))
+- Export module-owned macros at crate root
+- Re-export via prelude::macros
+
+🎯 param! Macro Pattern:
+- param! stays crate-level as DSL router
+- Delegates to helpers (e.g., string::utils, string::case)
+- Push validation/logic into helper functions, not macros
+
+================================================================================
+ 🔤 ASCII-SAFE vs UNICODE-SAFE PATTERNS
+================================================================================
+
+🔧 Helper Classification:
+- ASCII-SAFE: normalize output to ASCII (filenames/configs)
+  * Non-ASCII treated as separator and stripped
+- UNICODE-SAFE: operate on Unicode scalars via chars()
+  * NOT graphemes - uses char boundaries
+
+🏷️ Documentation Requirements:
+- Tag helpers with ASCII-SAFE or UNICODE-SAFE labels
+- Maintain registry for debug listing (optional)
+- Clear semantics in function documentation
+
+================================================================================
+ 🛠️ HELPER vs UTILS vs MACROS ORGANIZATION
+================================================================================
+
+📊 Role Definitions:
+
+🔧 helpers.rs:
+- Internal implementations
+- Consumed by utils and orchestrator
+- Not directly user-facing
+- Complex business logic lives here
+
+🎛️ utils.rs:
+- Curated low-level helpers
+- Users explicitly opt into "utils" namespace
+- Single source of truth for module functionality
+- Depends on helpers.rs for implementation
+
+🧪 macros.rs:
+- Module-owned macros only
+- Thin wrappers around helper functions
+- Both value and var forms when applicable
+- Exported at crate root
+
+📋 mod.rs:
+- Orchestrator ONLY
+- Curated public surface
+- Re-exports from utils/helpers/macros
+- NO business logic whatsoever
+
+================================================================================
+ 🚫 ERROR AND LOGGING CONVENTIONS
+================================================================================
+
+⚠️ Critical Rules:
+- Core modules MUST NOT depend on optional visual macros
+- Use utils::stderrx(level, msg) for best-effort, non-visual logging
+- Wrap examples/tests using visual macros with #[cfg(feature = "visual")]
+
+🔧 Error Handling:
+- error.rs contains typed error enums
+- Consistent messaging across module
+- Integration with RSB error handling patterns
+
+================================================================================
+ 🌊 STREAMS INTEGRATION GUIDANCE
+================================================================================
+
+🔧 Heavy Transformations:
+- Line-wise transformations belong in streams module
+- Handles large inputs safely without memory issues
+- Provide ergonomic wrappers in modules where it adds value
+
+🎯 When to Use Streams:
+- Case conversions on large files
+- Line-by-line processing
+- Memory-efficient transformations
+
+================================================================================
+ 🧪 TESTING ARCHITECTURE
+================================================================================
+
+🔧 Testing Requirements:
+- Include baseline sanity test for each module WITHOUT optional features
+- Gate adapter/integration tests with required features
+- Ensure runner lanes cover both default and feature-enabled profiles
+
+🎯 Test Organization:
+- tests/features/<module>/ for feature-gated tests
+- At least one sanity test that doesn't require adapter features
+- Use bin/test.sh lanes (smoke, all) and cargo feature combos
+
+================================================================================
+ 🌟 ROLO COMPLIANCE TRANSFORMATION
+================================================================================
+
+✅ CURRENT ROLO ISSUES (TO FIX):
+- Scattered helper functions
+- No clear module organization
+- Mixed business logic in main files
+- No prelude strategy
+
+✅ RSB COMPLIANCE STEPS:
+
+🎯 Step 1: Reorganize Module Structure
+- Create proper mod.rs orchestrator
+- Move helpers to helpers.rs
+- Curate public API in utils.rs
+- Extract macros to macros.rs
+
+🎯 Step 2: Implement Adapter Pattern
+- Identify cross-module dependencies
+- Create <module>_<dep>_adapter.rs files
+- Add feature gating for optional dependencies
+- Provide graceful fallbacks
+
+🎯 Step 3: Prelude Compliance
+- Define what goes in public prelude
+- Avoid leaking internal modules
+- Feature-gate optional components
+- Create curated re-export strategy
+
+🎯 Step 4: Error Handling
+- Create error.rs with typed enums
+- Remove visual macro dependencies from core
+- Use utils::stderrx for logging
+
+================================================================================
+ 📏 FEATURE FLAG STRATEGY
+================================================================================
+
+🔧 Feature Organization:
+- Base features (no dependencies)
+- Visual features (colors, glyphs, prompts)
+- Umbrella features (convenience groupings)
+- Integration features (cross-module adapters)
+
+🎯 Feature Isolation:
+- Core modules work without optional features
+- Graceful degradation when features disabled
+- Clear feature boundaries and dependencies
+
+================================================================================
+ 🔗 COMPLIANCE CHECKLIST FOR ROLO
+================================================================================
+
+✅ Module Structure:
+- [ ] mod.rs orchestrates only, no business logic
+- [ ] helpers.rs contains internal implementations
+- [ ] utils.rs has curated public helpers
+- [ ] macros.rs owns module-specific macros
+- [ ] error.rs has typed error enums
+
+✅ Cross-Module Dependencies:
+- [ ] Use adapter pattern for dependencies
+- [ ] Feature-gate optional integrations
+- [ ] Provide fallbacks for disabled features
+- [ ] Avoid circular dependencies
+
+✅ Prelude Strategy:
+- [ ] Curated re-exports only
+- [ ] No internal module leaking
+- [ ] Feature-gated optional components
+- [ ] Clear public API surface
+
+✅ Testing:
+- [ ] Baseline tests without features
+- [ ] Feature-gated integration tests
+- [ ] Both default and feature-enabled test lanes
+
+================================================================================
+ 🔗 REFERENCES
+================================================================================
+
+Source Files Analyzed:
+- /home/xnull/repos/code/rust/oodx/rsb/docs/tech/development/MODULE_SPEC.md
+- /home/xnull/repos/code/rust/oodx/rsb/docs/tech/development/PRELUDE_POLICY.md
+- /home/xnull/repos/code/rust/oodx/rsb/Cargo.toml (feature flags)
+
+Related Documents:
+- FEATURES_GATING_PLAN.md
+- HOWTO_TEST.md
+- AST_CONSIDERATIONS.md
+
+================================================================================
+ 📋 METADATA
+================================================================================
+
+Egg Type: Module Architecture Specification
+Target: RSB MODULE_SPEC compliance requirements
+Scope: Module organization, helpers, utils, macros, adapters
+Confidence: High (official specification document)
+Completeness: Full specification coverage
+
+⚠️ DISCLAIMER: This summary reflects RSB MODULE_SPEC as of 2025-09-15.
+Follow specification updates for latest compliance requirements.
+
+================================================================================
+ 🐔 CHINA'S SIGN-OFF
+================================================================================
+
+"From chaotic code coops to organized module henhouses - now that's what I
+call proper architectural nesting! Every helper in its place, every macro
+in its roost! 🏠🐔"
+
+               ~ China the Summary Chicken ~

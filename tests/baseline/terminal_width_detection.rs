@@ -8,7 +8,7 @@
 
 #[test]
 fn test_terminal_width_detection_basic() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Basic width detection should return a reasonable value
     let width = get_terminal_width();
@@ -18,7 +18,7 @@ fn test_terminal_width_detection_basic() {
 
 #[test]
 fn test_terminal_width_with_columns_env() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
     use std::env;
 
     // Save original value
@@ -52,7 +52,7 @@ fn test_terminal_width_with_columns_env() {
 
 #[test]
 fn test_width_validation() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Valid width values
     assert!(validate_width("80").is_ok());
@@ -69,7 +69,7 @@ fn test_width_validation() {
 
 #[test]
 fn test_cli_width_override() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test --width argument parsing
     let args = vec!["rolo".to_string(), "--width".to_string(), "100".to_string(), "--cols".to_string(), "2".to_string()];
@@ -83,7 +83,7 @@ fn test_cli_width_override() {
 
 #[test]
 fn test_cli_width_override_invalid() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test with invalid width
     let args = vec!["rolo".to_string(), "--width".to_string(), "invalid".to_string()];
@@ -98,7 +98,7 @@ fn test_cli_width_override_invalid() {
 
 #[test]
 fn test_fit_mode_default() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Default config should have fit mode enabled
     let config = CliConfig::default();
@@ -121,7 +121,7 @@ fn test_fit_mode_default() {
 
 #[test]
 fn test_fit_mode_width_selection() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Create test configs to verify width selection logic
     let mut fit_config = CliConfig::default();
@@ -143,7 +143,7 @@ fn test_fit_mode_width_selection() {
 #[test]
 #[cfg(unix)]
 fn test_terminal_resize_detection() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test terminal resize detection (basic functionality)
     // Note: This may return None if terminal size hasn't changed
@@ -168,7 +168,7 @@ fn test_terminal_resize_detection() {
 
 #[test]
 fn test_width_detection_fallback_chain() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
     use std::env;
 
     // Save original COLUMNS
@@ -190,7 +190,7 @@ fn test_width_detection_fallback_chain() {
 
 #[test]
 fn test_multiple_width_env_vars() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
     use std::env;
 
     // Save original values
@@ -225,7 +225,7 @@ fn test_multiple_width_env_vars() {
 
 #[test]
 fn test_cli_integration_width_and_fit() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test combined width and fit flags
     let args = vec![
@@ -249,7 +249,7 @@ fn test_cli_integration_width_and_fit() {
 
 #[test]
 fn test_width_constraints_validation() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test width constraint validation in different scenarios
     let very_small = validate_width("1");

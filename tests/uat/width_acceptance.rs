@@ -5,7 +5,7 @@ fn uat_width_calculation_accuracy() {
     println!("=== UAT: Width Calculation Accuracy ===");
     println!("Validating width calculations meet business requirements...");
 
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Executive requirement: ASCII text width should be predictable
     let ascii_text = "Hello World";
@@ -32,7 +32,7 @@ fn uat_width_validation_business_rules() {
     println!("=== UAT: Width Validation Business Rules ===");
     println!("Validating width constraints meet usability standards...");
 
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Executive requirement: Common terminal widths should be valid
     let common_widths = ["80", "120", "132", "160"];
@@ -67,7 +67,7 @@ fn uat_boxy_feature_integration() {
     println!("=== UAT: Boxy Feature Integration ===");
     println!("Validating enterprise-grade width calculation with boxy integration...");
 
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Executive requirement: ANSI escape sequences should be handled
     let ansi_text = "\x1b[32mGreen Text\x1b[0m";
@@ -86,7 +86,7 @@ fn uat_fallback_mode_reliability() {
     println!("=== UAT: Fallback Mode Reliability ===");
     println!("Validating system works without premium features...");
 
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Executive requirement: Basic functionality must work without dependencies
     let simple_text = "Simple text";

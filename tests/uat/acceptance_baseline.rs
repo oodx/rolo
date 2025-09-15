@@ -6,7 +6,7 @@ fn uat_project_loads_successfully() {
     println!("Validating that rolo loads and basic functions are accessible...");
 
     // Executive requirement: Library must load without panics
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     println!("✅ Prelude imported successfully");
 
@@ -27,7 +27,7 @@ fn uat_error_handling_works() {
     println!("=== UAT: Error Handling Validation ===");
     println!("Validating that error conditions are handled gracefully...");
 
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Executive requirement: Invalid input should return errors, not panic
     let result = validate_width("invalid");
@@ -52,7 +52,7 @@ fn uat_basic_functionality_demo() {
     println!("=== UAT: Basic Functionality Demonstration ===");
     println!("Demonstrating core functionality for executive review...");
 
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Executive demo: Show that the tool can handle text processing
     let sample_text = "Hello, executive team! This is a demonstration of rolo's capabilities.";

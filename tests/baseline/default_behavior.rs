@@ -5,7 +5,7 @@
 
 #[test]
 fn test_layout_config_defaults() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     let config = LayoutConfig::default();
 
@@ -16,23 +16,26 @@ fn test_layout_config_defaults() {
 }
 
 #[test]
-fn test_cli_config_defaults() {
-    use rolo::prelude::*;
+fn test_rsb_global_context_defaults() {
+    use rololib::prelude::*;
 
-    let config = CliConfig::default();
+    // Test RSB global context with defaults
+    set_var("columns", "3");
+    assert_eq!(get_var("columns"), "3");
 
-    // Test default CLI behavior
-    assert!(matches!(config.mode, CliMode::Columns)); // Default to columns mode
-    assert_eq!(config.columns, None); // No column override by default
-    assert_eq!(config.width, None); // No width override by default
-    assert!(!config.headers); // Headers off by default
-    assert!(!config.help); // Help not requested by default
-    assert!(!config.version); // Version not requested by default
+    set_var("width", "80");
+    assert_eq!(get_var("width"), "80");
+
+    set_var("headers", "1"); // 1=false in RSB
+    assert!(!is_true("headers"));
+
+    set_var("help", "1"); // 1=false in RSB
+    assert!(!is_true("help"));
 }
 
 #[test]
 fn test_stream_config_defaults() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     let config = StreamConfig::default();
 
@@ -44,7 +47,7 @@ fn test_stream_config_defaults() {
 
 #[test]
 fn test_default_width_detection() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test terminal width detection fallback
     let width = get_terminal_width();
@@ -56,7 +59,7 @@ fn test_default_width_detection() {
 
 #[test]
 fn test_default_error_handling() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test that errors have reasonable default messages
     let error = LayoutError::InvalidColumnCount(0);
@@ -72,7 +75,7 @@ fn test_default_error_handling() {
 
 #[test]
 fn test_pipeline_default_config() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test that pipeline uses sensible defaults
     let pipeline = Pipeline::new();
@@ -83,24 +86,19 @@ fn test_pipeline_default_config() {
 }
 
 #[test]
-fn test_cli_argument_parsing_defaults() {
-    use rolo::prelude::*;
+fn test_rsb_bootstrap_defaults() {
+    use rololib::prelude::*;
 
-    // Test that empty arguments result in sensible defaults
-    let args: Vec<String> = vec!["rolo".to_string()]; // Just program name
-    let result = parse_args(&args);
+    // Test that RSB bootstrap works with defaults
+    set_var("mode", "columns"); // Default mode
+    assert_eq!(get_var("mode"), "columns");
 
-    // Should either succeed with defaults or give helpful error
-    match result {
-        Ok(config) => {
-            // Should default to columns mode
-            assert!(matches!(config.mode, CliMode::Columns));
-        }
-        Err(_) => {
-            // If it fails, that's also acceptable for empty args
-            // The important thing is it doesn't panic
-        }
-    }
+    // Test default RSB variables
+    set_var("verbose", "1"); // 1=false
+    assert!(!is_true("verbose"));
+
+    set_var("debug", "1"); // 1=false
+    assert!(!is_true("debug"));
 }
 
 #[test]

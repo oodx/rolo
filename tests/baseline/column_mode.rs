@@ -8,7 +8,7 @@
 
 #[test]
 fn test_column_mode_basic_functionality() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test basic 2-column layout (acceptance criteria)
     let input = "a\nb\nc\nd";
@@ -28,7 +28,7 @@ fn test_column_mode_basic_functionality() {
 
 #[test]
 fn test_column_mode_with_custom_config() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     let input = "one\ntwo\nthree\nfour\nfive\nsix";
     let config = LayoutConfig {
@@ -57,7 +57,7 @@ fn test_column_mode_with_custom_config() {
 
 #[test]
 fn test_column_mode_error_conditions() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test zero columns
     let result = format_columns("test", 0);
@@ -77,7 +77,7 @@ fn test_column_mode_error_conditions() {
 
 #[test]
 fn test_column_mode_empty_input() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     let result = format_columns("", 2);
     assert!(result.is_ok());
@@ -86,7 +86,7 @@ fn test_column_mode_empty_input() {
 
 #[test]
 fn test_column_mode_single_item() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     let result = format_columns("single", 2);
     assert!(result.is_ok());
@@ -95,7 +95,7 @@ fn test_column_mode_single_item() {
 
 #[test]
 fn test_column_mode_gap_spacing() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     let input = "a\nb\nc\nd";
 
@@ -123,7 +123,7 @@ fn test_column_mode_gap_spacing() {
 
 #[test]
 fn test_column_mode_ansi_aware_width() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test with ANSI escape sequences
     let input = "\x1b[31mred\x1b[0m\nblue\n\x1b[32mgreen\x1b[0m\nyellow";
@@ -146,7 +146,7 @@ fn test_column_mode_ansi_aware_width() {
 
 #[test]
 fn test_column_mode_unicode_content() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test with Unicode characters (wide chars)
     let input = "hello\n世界\ntest\nうに";
@@ -162,7 +162,7 @@ fn test_column_mode_unicode_content() {
 
 #[test]
 fn test_column_mode_layout_algorithm() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test that items are distributed column-wise (not row-wise)
     let input = "1\n2\n3\n4\n5\n6";
@@ -191,7 +191,7 @@ fn test_column_mode_layout_algorithm() {
 
 #[test]
 fn test_column_mode_cli_integration() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test CLI configuration with gap option
     let mut config = CliConfig::default();
@@ -205,7 +205,7 @@ fn test_column_mode_cli_integration() {
 
 #[test]
 fn test_column_mode_width_constraints() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test that very narrow columns are rejected
     let config = LayoutConfig {
@@ -221,7 +221,7 @@ fn test_column_mode_width_constraints() {
 
 #[test]
 fn test_column_mode_delimiter_support() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     let config = LayoutConfig::default();
 

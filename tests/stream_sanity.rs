@@ -2,7 +2,7 @@
 //!
 //! Basic functionality tests for the stream processing module
 
-use rolo::prelude::*;
+use rololib::prelude::*;
 
 #[test]
 fn test_stream_config_default() {

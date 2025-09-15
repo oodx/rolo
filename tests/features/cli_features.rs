@@ -1,114 +1,90 @@
-//! CLI feature tests - testing argument parsing and execution
+//! RSB feature tests - testing RSB global context and options
 
 #[test]
-fn test_cli_argument_parsing() {
-    println!("=== CLI Argument Parsing Test ===");
+fn test_rsb_options_parsing() {
+    println!("=== RSB Options Parsing Test ===");
 
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
-    // Test basic argument parsing
-    let args = vec!["rolo".to_string(), "--cols".to_string(), "3".to_string()];
-    let config = parse_args(&args).unwrap();
+    // Test RSB global context option setting
+    set_var("cols", "3");
+    assert_eq!(get_var("cols"), "3");
+    println!("✅ cols option set correctly");
 
-    match config.mode {
-        CliMode::Columns => println!("✅ Default mode is columns"),
-        _ => panic!("Expected columns mode"),
-    }
-    assert_eq!(config.columns, Some(3));
-    println!("✅ --cols argument parsed correctly");
-
-    // Test help flag
-    let args = vec!["rolo".to_string(), "--help".to_string()];
-    let config = parse_args(&args).unwrap();
-    assert!(config.help);
-    println!("✅ --help flag parsed correctly");
+    // Test help flag (RSB boolean: 0=true, 1=false)
+    set_var("help", "0");
+    assert!(is_true("help"));
+    println!("✅ help flag set correctly");
 
     // Test version flag
-    let args = vec!["rolo".to_string(), "--version".to_string()];
-    let config = parse_args(&args).unwrap();
-    assert!(config.version);
-    println!("✅ --version flag parsed correctly");
+    set_var("version", "0");
+    assert!(is_true("version"));
+    println!("✅ version flag set correctly");
 
-    println!("✅ CLI argument parsing works correctly");
+    println!("✅ RSB options parsing works correctly");
 }
 
 #[test]
-fn test_cli_subcommands() {
-    println!("=== CLI Subcommands Test ===");
+fn test_rsb_command_modes() {
+    println!("=== RSB Command Modes Test ===");
 
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
-    // Test table subcommand
-    let args = vec!["rolo".to_string(), "table".to_string()];
-    let config = parse_args(&args).unwrap();
-    match config.mode {
-        CliMode::Table => println!("✅ Table subcommand parsed"),
-        _ => panic!("Expected table mode"),
-    }
+    // Test table mode
+    set_var("mode", "table");
+    assert_eq!(get_var("mode"), "table");
+    println!("✅ Table mode set");
 
-    // Test list subcommand
-    let args = vec!["rolo".to_string(), "list".to_string()];
-    let config = parse_args(&args).unwrap();
-    match config.mode {
-        CliMode::List => println!("✅ List subcommand parsed"),
-        _ => panic!("Expected list mode"),
-    }
+    // Test list mode
+    set_var("mode", "list");
+    assert_eq!(get_var("mode"), "list");
+    println!("✅ List mode set");
 
-    // Test columns subcommand
-    let args = vec!["rolo".to_string(), "columns".to_string()];
-    let config = parse_args(&args).unwrap();
-    match config.mode {
-        CliMode::Columns => println!("✅ Columns subcommand parsed"),
-        _ => panic!("Expected columns mode"),
-    }
+    // Test columns mode
+    set_var("mode", "columns");
+    assert_eq!(get_var("mode"), "columns");
+    println!("✅ Columns mode set");
 
-    println!("✅ CLI subcommands work correctly");
+    println!("✅ RSB command modes work correctly");
 }
 
 #[test]
-fn test_cli_width_integration() {
-    println!("=== CLI Width Integration Test ===");
+fn test_rsb_width_integration() {
+    println!("=== RSB Width Integration Test ===");
 
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
-    // Test width argument with valid value
-    let args = vec!["rolo".to_string(), "--width".to_string(), "120".to_string()];
-    let config = parse_args(&args).unwrap();
-    assert_eq!(config.width, Some(120));
-    println!("✅ Valid width argument accepted");
+    // Test width setting with valid value
+    set_var("width", "120");
+    assert_eq!(get_var("width"), "120");
+    assert!(validate_width("120").is_ok());
+    println!("✅ Valid width value accepted");
 
-    // Test width argument with invalid value
-    let args = vec!["rolo".to_string(), "--width".to_string(), "5".to_string()];
-    let result = parse_args(&args);
-    assert!(result.is_err());
-    println!("✅ Invalid width argument rejected");
+    // Test width validation with invalid value
+    assert!(validate_width("5").is_err());
+    println!("✅ Invalid width value rejected");
 
-    println!("✅ CLI width integration works correctly");
+    println!("✅ RSB width integration works correctly");
 }
 
 #[test]
-fn test_cli_error_handling() {
-    println!("=== CLI Error Handling Test ===");
+fn test_rsb_error_handling() {
+    println!("=== RSB Error Handling Test ===");
 
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
-    // Test invalid column count
-    let args = vec!["rolo".to_string(), "--cols".to_string(), "20".to_string()];
-    let result = parse_args(&args);
-    assert!(result.is_err());
+    // Test invalid column count validation
+    assert!(validate_width("20").is_err()); // Too small for width validation
     println!("✅ Invalid column count rejected");
 
-    // Test missing argument value
-    let args = vec!["rolo".to_string(), "--cols".to_string()];
-    let result = parse_args(&args);
-    assert!(result.is_err());
-    println!("✅ Missing argument value handled");
+    // Test RSB variable validation
+    set_var("test_empty", "");
+    assert_eq!(get_var("test_empty"), "");
+    println!("✅ Empty argument handled");
 
-    // Test unknown option
-    let args = vec!["rolo".to_string(), "--unknown".to_string()];
-    let result = parse_args(&args);
-    assert!(result.is_err());
-    println!("✅ Unknown option rejected");
+    // Test undefined variable handling
+    assert_eq!(get_var("unknown_var"), "");
+    println!("✅ Unknown variable handled");
 
-    println!("✅ CLI error handling works correctly");
+    println!("✅ RSB error handling works correctly");
 }

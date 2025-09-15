@@ -1,0 +1,308 @@
+================================================================================
+ 🐔 CHINA'S RSB GLOBAL OPTIONS EGG #2 🥚
+================================================================================
+
+Date: 2025-09-15
+Time: Current session
+Requestor: User
+Purpose: RSB global context system to replace custom Config structs
+
+================================================================================
+ 🎯 EXECUTIVE SUMMARY
+================================================================================
+
+RSB uses a global context system that replaces custom Config structs with
+centralized get_var(), set_var(), and is_true() functions. All CLI options
+are stored as opt_<name> variables accessible throughout the application
+without passing config objects around.
+
+================================================================================
+ 🔍 KEY DISCOVERY: GLOBAL CONTEXT REPLACES CONFIG STRUCTS
+================================================================================
+
+TRADITIONAL APPROACH:
+- Create custom Config structs
+- Parse args into struct fields
+- Pass config around as parameters
+
+RSB APPROACH:
+- Parse args into global opt_* variables
+- Access anywhere via global::get_var()
+- No config passing needed
+
+================================================================================
+ 📊 OPTIONS PROCESSING SYSTEM
+================================================================================
+
+🎛️ options() Function Core Logic:
+```rust
+pub fn options(args: &Args) {
+    for arg in args.all() {
+        if arg.starts_with("--") {
+            // Process long options
+        } else if arg.starts_with("-") && arg.len() == 2 {
+            // Process short options
+        }
+    }
+}
+```
+
+🔧 Long Option Processing:
+- --verbose → opt_verbose="1"
+- --config=file.conf → opt_config="file.conf"
+- --not-verbose → opt_verbose="0" (negation)
+- --multi=a,b,!c → sets multiple opt_* flags
+
+🔧 Short Option Processing:
+- -v → opt_v="1"
+- Standard mappings when stdopts feature enabled:
+  * -d → opt_debug="1"
+  * -q → opt_quiet="1"
+  * -t → opt_trace="1"
+  * -D → opt_dev_mode="1"
+  * -y → opt_yes="1"
+  * -s → opt_safe="1"
+
+================================================================================
+ 🌐 GLOBAL CONTEXT ACCESS PATTERNS
+================================================================================
+
+🔧 Core Access Functions:
+```rust
+// Setting values
+global::set_var("opt_verbose", "1");
+
+// Getting values
+let config_file = global::get_var("opt_config");
+
+// Boolean checks
+let is_verbose = global::is_true("opt_verbose");
+```
+
+🎯 Helper Functions Available:
+```rust
+// Check if option was provided
+has_option("verbose") -> bool
+
+// Get option value if provided
+get_option_value("config") -> Option<String>
+```
+
+================================================================================
+ 🔄 VARIABLE NAMING CONVENTIONS
+================================================================================
+
+🏷️ Option Variables:
+- All options stored with "opt_" prefix
+- Dashes converted to underscores
+- --my-flag → opt_my_flag
+- --config-file → opt_config_file
+
+🏷️ Negation Handling:
+- --not-verbose → opt_verbose="0"
+- Regular flags → opt_name="1"
+- Value options → opt_name="actual_value"
+
+================================================================================
+ 🛡️ PATH VALIDATION SYSTEM
+================================================================================
+
+🔍 Automatic Path Validation:
+```rust
+// Path validation for path/file options
+if opt_name.contains("path") || opt_name.contains("file") {
+    let path = Path::new(opt_value);
+    if !path.exists() {
+        eprintln!("Path does not exist: {}", opt_value);
+        std::process::exit(1);
+    }
+}
+```
+
+⚠️ Built-in Safety:
+- Any option containing "path" or "file" in name
+- Automatically validated for existence
+- Process exits with error if path doesn't exist
+
+================================================================================
+ 🎯 MULTI-OPTION SYSTEM
+================================================================================
+
+🧪 Multi-Option Syntax:
+```
+--multi=a,b,!c
+```
+
+🔧 Processing Logic:
+- Comma separates different flags
+- Exclamation mark (!) negates next flag
+- Sets multiple opt_* variables:
+  * opt_a="1"
+  * opt_b="1"
+  * opt_c="0" (negated)
+
+================================================================================
+ 🔗 GLOBAL CONTEXT ARCHITECTURE
+================================================================================
+
+🏗️ Context System Features:
+- Variables stored in global namespace
+- Thread-safe access (when properly initialized)
+- Supports namespacing via ns_set/ns_get
+- Environment variable import capabilities
+- Config file application support
+
+🎛️ Advanced Features:
+```rust
+// Namespaced variables
+global::ns_set("app", "debug", "1");
+global::ns_get("app", "debug");
+
+// Environment import
+hosts::global::import_env_with_prefix("MYAPP_", true);
+
+// Config file application
+global::apply_config_files(&["app.conf", "user.conf"]);
+```
+
+================================================================================
+ 🌟 ROLO TRANSFORMATION GUIDELINES
+================================================================================
+
+✅ CURRENT ROLO PATTERN (TO REPLACE):
+```rust
+struct CliConfig {
+    verbose: bool,
+    output_file: Option<String>,
+    debug: bool,
+}
+
+fn parse_args(args: Vec<String>) -> CliConfig {
+    // Custom parsing logic
+    CliConfig { ... }
+}
+
+fn main() {
+    let config = parse_args(env::args().collect());
+    run_with_config(config);
+}
+```
+
+✅ NEW RSB PATTERN:
+```rust
+fn main() {
+    let args = bootstrap!();  // Sets up global context
+    options!(&args);          // Parses into opt_* variables
+
+    dispatch!(&args, {
+        "command1" => cmd1,
+        "command2" => cmd2,
+    });
+}
+
+fn cmd1(args: Args) -> i32 {
+    // Access options via global context
+    let verbose = global::is_true("opt_verbose");
+    let output = global::get_var("opt_output_file");
+    let debug = global::is_true("opt_debug");
+
+    // Use values directly
+    if verbose { println!("Verbose mode enabled"); }
+    0
+}
+```
+
+================================================================================
+ 🔄 MIGRATION CHECKLIST
+================================================================================
+
+🎯 Step 1: Remove Custom Config
+- Delete CliConfig struct definition
+- Remove parse_args function
+- Eliminate config parameter passing
+
+🎯 Step 2: Add RSB Bootstrap
+- Add bootstrap!() call at start of main()
+- Add options!() call after bootstrap
+- Replace manual arg parsing
+
+🎯 Step 3: Update Command Functions
+- Change signatures to fn(Args) -> i32
+- Replace config.field access with global::get_var()
+- Use global::is_true() for boolean options
+
+🎯 Step 4: Update Option Access
+- verbose: config.verbose → global::is_true("opt_verbose")
+- file: config.file → global::get_var("opt_file")
+- debug: config.debug → global::is_true("opt_debug")
+
+================================================================================
+ 🚨 IMPORTANT GOTCHAS
+================================================================================
+
+⚠️ Variable Access:
+- Always use "opt_" prefix for CLI options
+- Dashes become underscores in variable names
+- Empty string returned for unset variables
+
+⚠️ Boolean Logic:
+- Use is_true() not direct string comparison
+- "1" = true, "0" = false, "" = false
+- Negated options explicitly set to "0"
+
+⚠️ Initialization Order:
+1. bootstrap!() MUST come first
+2. options!() MUST come before option access
+3. dispatch!() comes last for routing
+
+================================================================================
+ 📈 BENEFITS OF RSB GLOBAL CONTEXT
+================================================================================
+
+✅ Eliminates Config Passing:
+- No more threading config through function calls
+- Global access from anywhere in codebase
+- Cleaner function signatures
+
+✅ Standardized Patterns:
+- Consistent opt_* naming convention
+- Built-in boolean handling with is_true()
+- Automatic path validation
+
+✅ Enhanced Features:
+- Negation support (--not-flag)
+- Multi-option parsing
+- Standard option mappings
+- Built-in help/inspect commands
+
+================================================================================
+ 🔗 REFERENCES
+================================================================================
+
+Source Files Analyzed:
+- /home/xnull/repos/code/rust/oodx/rsb/src/cli/options.rs
+- /home/xnull/repos/code/rust/oodx/rsb/src/hosts/global.rs
+- /home/xnull/repos/code/rust/oodx/rsb/tests/options.rs
+
+================================================================================
+ 📋 METADATA
+================================================================================
+
+Egg Type: Global Context Analysis
+Target: RSB options and global variable system
+Scope: CLI option parsing and global context access
+Confidence: High (direct source analysis)
+Focus: Replacing custom Config structs with global context
+
+⚠️ DISCLAIMER: This summary reflects RSB global context patterns as of
+analysis date. Verify current global module API before implementing.
+
+================================================================================
+ 🐔 CHINA'S SIGN-OFF
+================================================================================
+
+"From scattered config structs to unified global context - now that's what
+I call gathering all the eggs in one basket! No more passing config around
+like a hot potato! 🥔→🥚"
+
+               ~ China the Summary Chicken ~

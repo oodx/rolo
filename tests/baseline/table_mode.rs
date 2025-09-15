@@ -8,7 +8,7 @@
 
 #[test]
 fn test_table_mode_basic_functionality() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test basic table with TSV data (acceptance criteria)
     let input = "Name\tAge\tCity\nJohn\t25\tNew York\nAlice\t30\tLondon";
@@ -30,7 +30,7 @@ fn test_table_mode_basic_functionality() {
 
 #[test]
 fn test_table_mode_with_csv_delimiter() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     let input = "Product,Price,Stock\nApple,1.50,100\nBanana,0.75,50";
     let result = format_table(input, ",");
@@ -51,7 +51,7 @@ fn test_table_mode_with_csv_delimiter() {
 
 #[test]
 fn test_table_mode_auto_width_detection() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test with varying column widths
     let input = "A\tVery Long Header Name\tC\nX\tShort\tY\nZ\tMedium Length\tW";
@@ -73,7 +73,7 @@ fn test_table_mode_auto_width_detection() {
 
 #[test]
 fn test_table_mode_with_width_constraints() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     let input = "Header1\tVery Long Header That Exceeds Width\tHeader3\nData1\tShort\tData3";
     let result = format_table_with_config(input, "\t", 40);
@@ -94,7 +94,7 @@ fn test_table_mode_with_width_constraints() {
 
 #[test]
 fn test_table_mode_row_overflow_handling() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test with uneven rows (some rows have more columns than others)
     let input = "A\tB\tC\nX\tY\nZ\tW\tV\tU"; // Second row missing column, fourth row has extra
@@ -119,7 +119,7 @@ fn test_table_mode_row_overflow_handling() {
 
 #[test]
 fn test_table_mode_empty_input() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     let result = format_table("", "\t");
     assert!(result.is_ok());
@@ -133,7 +133,7 @@ fn test_table_mode_empty_input() {
 
 #[test]
 fn test_table_mode_single_row() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     let result = format_table("Column1\tColumn2\tColumn3", "\t");
     assert!(result.is_ok());
@@ -149,7 +149,7 @@ fn test_table_mode_single_row() {
 
 #[test]
 fn test_table_mode_single_column() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     let input = "Header\nValue1\nValue2\nValue3";
     let result = format_table(input, "\t");
@@ -168,7 +168,7 @@ fn test_table_mode_single_column() {
 
 #[test]
 fn test_table_mode_custom_delimiters() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test semicolon delimiter
     let input = "Name;Age;Country\nJohn;25;USA\nMarie;30;France";
@@ -191,7 +191,7 @@ fn test_table_mode_custom_delimiters() {
 
 #[test]
 fn test_table_mode_with_spaces_in_cells() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     let input = "Full Name\tJob Title\tCompany\nJohn Doe\tSoftware Engineer\tTech Corp\nJane Smith\tProduct Manager\tInnovate Inc";
     let result = format_table(input, "\t");
@@ -212,7 +212,7 @@ fn test_table_mode_with_spaces_in_cells() {
 
 #[test]
 fn test_table_mode_ansi_aware_content() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test with ANSI escape sequences
     let input = "\x1b[31mRed Header\x1b[0m\tNormal\n\x1b[32mGreen Data\x1b[0m\tRegular";
@@ -235,7 +235,7 @@ fn test_table_mode_ansi_aware_content() {
 
 #[test]
 fn test_table_mode_unicode_content() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test with Unicode characters (wide chars)
     let input = "名前\t年齢\t都市\n太郎\t25\t東京\n花子\t30\t大阪";
@@ -254,7 +254,7 @@ fn test_table_mode_unicode_content() {
 
 #[test]
 fn test_table_mode_truncation() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test with very long content that should be truncated
     let very_long_content = "Very".repeat(50); // 200 characters
@@ -276,7 +276,7 @@ fn test_table_mode_truncation() {
 
 #[test]
 fn test_table_mode_cli_integration() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test CLI configuration for table mode
     let mut config = CliConfig::default();

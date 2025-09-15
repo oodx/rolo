@@ -6,32 +6,32 @@
 #[test]
 fn test_basic_imports() {
     // Test that basic imports work without features
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Should be able to create default configurations
     let _layout_config = LayoutConfig::default();
-    let _cli_config = CliConfig::default();
+    // Using RSB global context instead of CliConfig
     let _stream_config = StreamConfig::default();
 }
 
 #[test]
-fn test_cli_modes() {
-    use rolo::prelude::*;
+fn test_rsb_global_context() {
+    use rololib::prelude::*;
 
-    // Test CLI mode enum works
-    let mode = CliMode::Columns;
-    assert!(matches!(mode, CliMode::Columns));
+    // Test RSB global context operations
+    set_var("test_key", "test_value");
+    assert_eq!(get_var("test_key"), "test_value");
 
-    let mode = CliMode::Table;
-    assert!(matches!(mode, CliMode::Table));
+    set_var("test_flag", "0"); // 0=true in RSB
+    assert!(is_true("test_flag"));
 
-    let mode = CliMode::List;
-    assert!(matches!(mode, CliMode::List));
+    set_var("test_flag", "1"); // 1=false in RSB
+    assert!(!is_true("test_flag"));
 }
 
 #[test]
 fn test_basic_width_functionality() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test basic width validation (should work without boxy feature)
     assert!(validate_width("80").is_ok());
@@ -41,7 +41,7 @@ fn test_basic_width_functionality() {
 
 #[test]
 fn test_layout_placeholders() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test that layout functions exist (even if they return placeholders)
     let result = format_columns("test\ndata", 2);
@@ -56,7 +56,7 @@ fn test_layout_placeholders() {
 
 #[test]
 fn test_stream_operations_basic() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test basic stream config and pipeline creation
     let config = StreamConfig::default();
@@ -68,18 +68,17 @@ fn test_stream_operations_basic() {
 
 #[test]
 fn test_error_types() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test that all error types are accessible
     let _layout_error = LayoutError::InvalidColumnCount(0);
     let _width_error = WidthError::InvalidRange(0, 10, 200);
-    let _cli_error = CliError::InvalidArgument("test".to_string());
     let _stream_error = StreamError::UnexpectedEof;
 
     // Test error display
     assert!(format!("{}", _layout_error).contains("Invalid") || format!("{}", _layout_error).contains("column"));
     assert!(format!("{}", _width_error).contains("range") || format!("{}", _width_error).contains("Invalid"));
-    assert!(format!("{}", _cli_error).contains("Invalid"));
+    // CLI error removed - using RSB patterns now
     assert!(format!("{}", _stream_error).contains("Unexpected"));
 }
 
@@ -94,7 +93,7 @@ fn test_rsb_integration_basic() {
 
 #[test]
 fn test_line_endings() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test line ending enum
     assert_eq!(LineEnding::Unix.as_str(), "\n");

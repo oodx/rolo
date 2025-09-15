@@ -7,7 +7,7 @@ use std::path::Path;
 
 #[test]
 fn test_table_mode_with_sample_tsv() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Read the actual test data file
     let test_data_path = "tests/data/sample.tsv";
@@ -37,7 +37,7 @@ fn test_table_mode_with_sample_tsv() {
 
 #[test]
 fn test_table_mode_with_sample_csv() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     let test_data_path = "tests/data/sample.csv";
     if !Path::new(test_data_path).exists() {
@@ -64,7 +64,7 @@ fn test_table_mode_with_sample_csv() {
 
 #[test]
 fn test_column_mode_with_simple_list() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     let test_data_path = "tests/data/simple_list.txt";
     if !Path::new(test_data_path).exists() {
@@ -90,7 +90,7 @@ fn test_column_mode_with_simple_list() {
 
 #[test]
 fn test_table_mode_with_unicode_content() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     let test_data_path = "tests/data/unicode_content.tsv";
     if !Path::new(test_data_path).exists() {
@@ -116,7 +116,7 @@ fn test_table_mode_with_unicode_content() {
 
 #[test]
 fn test_table_mode_with_long_content() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     let test_data_path = "tests/data/long_content.tsv";
     if !Path::new(test_data_path).exists() {
@@ -149,7 +149,7 @@ fn test_table_mode_with_long_content() {
 
 #[test]
 fn test_table_mode_with_uneven_rows() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     let test_data_path = "tests/data/uneven_rows.tsv";
     if !Path::new(test_data_path).exists() {

@@ -5,7 +5,7 @@
 #[test]
 fn test_boxy_adapter_available() {
     // Test that boxy adapter functions are available when feature is enabled
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test basic width calculation
     let width = get_display_width("hello world").expect("Width calculation should succeed");
@@ -18,7 +18,7 @@ fn test_boxy_adapter_available() {
 
 #[test]
 fn test_unicode_width_calculation() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test Unicode width calculation with boxy feature
     let width = get_display_width("hello 世界").expect("Unicode width calculation should succeed");
@@ -35,7 +35,7 @@ fn test_unicode_width_calculation() {
 
 #[test]
 fn test_ansi_stripping() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test various ANSI escape sequences
     let test_cases = vec![
@@ -55,7 +55,7 @@ fn test_ansi_stripping() {
 
 #[test]
 fn test_mixed_content_width() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test complex mixed content
     let mixed = "\x1b[31m世界\x1b[0m hello \x1b[1mworld\x1b[0m";
@@ -73,7 +73,7 @@ fn test_mixed_content_width() {
 
 #[test]
 fn test_width_validation_with_boxy() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test that width validation works properly with boxy feature
     assert!(validate_width("10").is_ok());
@@ -87,7 +87,7 @@ fn test_width_validation_with_boxy() {
 
 #[test]
 fn test_terminal_width_detection_boxy() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test terminal width detection with boxy features
     let width = get_terminal_width();
@@ -103,7 +103,7 @@ fn test_terminal_width_detection_boxy() {
 
 #[test]
 fn test_boxy_integration_edge_cases() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test edge cases that might occur with boxy integration
 
@@ -125,7 +125,7 @@ fn test_boxy_integration_edge_cases() {
 
 #[test]
 fn test_width_consistency() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test that width calculations are consistent
     let text = "hello world";

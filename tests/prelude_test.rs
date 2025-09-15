@@ -7,7 +7,7 @@ fn test_prelude_layout_exports() {
     println!("=== Prelude Layout Exports Test ===");
 
     // Test that layout functions are available via prelude
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     let config = LayoutConfig::default();
     println!("Default layout config: width={}, gap={}, padding={}",
@@ -25,7 +25,7 @@ fn test_prelude_layout_exports() {
 fn test_prelude_width_exports() {
     println!("=== Prelude Width Exports Test ===");
 
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test width functions
     let term_width = get_terminal_width();
@@ -47,7 +47,7 @@ fn test_prelude_width_exports() {
 fn test_prelude_error_exports() {
     println!("=== Prelude Error Exports Test ===");
 
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test error types are available
     let _width_error = WidthError::InvalidInput("test".to_string());
@@ -60,7 +60,7 @@ fn test_prelude_error_exports() {
 fn test_prelude_macro_exports() {
     println!("=== Prelude Macro Exports Test ===");
 
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test layout_config macro
     let config1 = layout_config!(100);
@@ -86,7 +86,7 @@ fn test_prelude_comprehensive() {
     println!("=== Comprehensive Prelude Test ===");
 
     // Test that everything works together
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Get terminal dimensions
     let term_width = get_terminal_width();

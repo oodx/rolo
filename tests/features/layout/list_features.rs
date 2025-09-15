@@ -1,6 +1,6 @@
 //! Layout list mode feature tests - comprehensive coverage per RSB MODULE_SPEC
 
-use rolo::prelude::*;
+use rololib::prelude::*;
 
 #[cfg(test)]
 mod tests {

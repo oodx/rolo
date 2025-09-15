@@ -5,7 +5,7 @@
 
 #[test]
 fn test_width_validation_errors() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test width validation boundaries
     assert!(validate_width("0").is_err());
@@ -18,7 +18,7 @@ fn test_width_validation_errors() {
 
 #[test]
 fn test_layout_error_handling() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test layout errors are properly typed
     let error = LayoutError::InvalidColumnCount(0);
@@ -33,7 +33,7 @@ fn test_layout_error_handling() {
 
 #[test]
 fn test_cli_error_handling() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test CLI error construction and display
     let error = CliError::InvalidArgument("test".to_string());
@@ -48,7 +48,7 @@ fn test_cli_error_handling() {
 
 #[test]
 fn test_stream_error_handling() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test various stream error types
     let error = StreamError::UnexpectedEof;
@@ -67,7 +67,7 @@ fn test_stream_error_handling() {
 
 #[test]
 fn test_width_error_conversion() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test that width errors have proper error types
     let result = validate_width("0");
@@ -85,7 +85,7 @@ fn test_width_error_conversion() {
 
 #[test]
 fn test_io_error_conversion() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
     use std::io::{Error, ErrorKind};
 
     // Test that std::io::Error converts to StreamError properly
@@ -102,7 +102,7 @@ fn test_io_error_conversion() {
 
 #[test]
 fn test_utf8_error_conversion() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test UTF-8 error handling in streams
     let invalid_utf8 = vec![0xFF, 0xFE, 0xFD]; // Invalid UTF-8 bytes
@@ -117,7 +117,7 @@ fn test_utf8_error_conversion() {
 
 #[test]
 fn test_error_chain_compatibility() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
     use std::error::Error;
 
     // Test that our errors work with error chaining
@@ -132,7 +132,7 @@ fn test_error_chain_compatibility() {
 
 #[test]
 fn test_error_display_formatting() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test that error messages are user-friendly
     let errors = vec![
@@ -157,7 +157,7 @@ fn test_error_display_formatting() {
 
 #[test]
 fn test_graceful_failure_modes() {
-    use rolo::prelude::*;
+    use rololib::prelude::*;
 
     // Test that invalid operations fail gracefully rather than panicking
 
