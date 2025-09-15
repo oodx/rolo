@@ -39,6 +39,10 @@ fn test_module_structure_compliance() {
     let _result = rolo::width::utils::get_display_width("test");
     println!("✅ Width utilities accessible");
 
+    // Test CLI utilities accessible
+    let _cli_config = rolo::cli::CliConfig::default();
+    println!("✅ CLI utilities accessible");
+
     println!("✅ MODULE_SPEC compliance verified!");
 }
 

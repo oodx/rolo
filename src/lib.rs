@@ -8,8 +8,9 @@
 // Module exports following RSB MODULE_SPEC
 pub mod layout;
 pub mod width;
+pub mod cli;
 
-// Stream and CLI modules (placeholder structure)
+// Stream module (placeholder structure)
 // TODO: Implement remaining modules in subsequent tasks
 
 /// Prelude with curated exports per MODULE_SPEC
@@ -20,14 +21,18 @@ pub mod prelude {
     // Width calculation functionality
     pub use crate::width::{get_display_width, get_terminal_width, validate_width};
 
+    // CLI functionality
+    pub use crate::cli::{CliConfig, CliMode, parse_args, execute_cli, dispatch_cli};
+
     // Error types for comprehensive error handling
     pub use crate::width::error::WidthError;
     pub use crate::layout::error::LayoutError;
+    pub use crate::cli::error::CliError;
 
     // Module-owned macros
     pub use crate::layout_config;
 
-    // TODO: Add CLI and Stream modules as they are implemented
+    // TODO: Add Stream module as it is implemented
 }
 
 // Re-export prelude at crate root for convenience
