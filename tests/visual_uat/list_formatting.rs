@@ -45,7 +45,7 @@ fn visual_uat_basic_list_formatting() {
 
     // Simulate RSB global context (as set by options!())
     set_var("opt_width", "80");
-    set_var("opt_fit", "0"); // 0=true in RSB
+    set_var("opt_fit", "true"); // RSB: standard Rust boolean
 
     // Test RSB global context access
     let width: usize = get_var("opt_width").parse().unwrap_or(80);

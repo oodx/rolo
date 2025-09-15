@@ -190,17 +190,22 @@ fn test_column_mode_layout_algorithm() {
 }
 
 #[test]
-fn test_column_mode_cli_integration() {
+fn test_column_mode_rsb_integration() {
     use rololib::prelude::*;
 
-    // Test CLI configuration with gap option
-    let mut config = CliConfig::default();
-    config.gap = Some(3);
-    config.columns = Some(2);
+    // Test RSB global context with gap and column options
+    set_var("gap", "3");
+    set_var("columns", "2");
 
-    // Should be able to construct this configuration
-    assert_eq!(config.gap, Some(3));
-    assert_eq!(config.columns, Some(2));
+    // Should be able to read these configurations from RSB context
+    assert_eq!(get_var("gap"), "3");
+    assert_eq!(get_var("columns"), "2");
+
+    // Test parsing values from RSB context
+    let gap: u8 = get_var("gap").parse().unwrap();
+    let columns: u8 = get_var("columns").parse().unwrap();
+    assert_eq!(gap, 3);
+    assert_eq!(columns, 2);
 }
 
 #[test]

@@ -48,20 +48,10 @@ fn visual_uat_basic_table_formatting() {
     // RSB integration setup
     set_var("mode", "table");
     set_var("width", "80");
-    set_var("headers", "1"); // 1=false in RSB
+    set_var("headers", "false"); // RSB: standard Rust boolean
 
     // Old CLI config replaced with RSB
-    let _old_config = "CliConfig {"
-        // mode: table (now in RSB context)
-        // columns: None (now in RSB context)
-        // width: 80 (now in RSB context)
-        // gap: None
-        // delimiter: None
-        // fit_mode: true
-        // headers: false (now in RSB context)
-        // help: false
-        // version: false
-    // };"
+    // Previously used CliConfig struct
 
     println!("📊 CLI Integration Test:");
     println!("Command: rolo table --width 80");

@@ -26,10 +26,10 @@ fn test_rsb_global_context_defaults() {
     set_var("width", "80");
     assert_eq!(get_var("width"), "80");
 
-    set_var("headers", "1"); // 1=false in RSB
+    set_var("headers", "false"); // RSB: standard Rust boolean
     assert!(!is_true("headers"));
 
-    set_var("help", "1"); // 1=false in RSB
+    set_var("help", "false"); // RSB: standard Rust boolean
     assert!(!is_true("help"));
 }
 
@@ -94,10 +94,10 @@ fn test_rsb_bootstrap_defaults() {
     assert_eq!(get_var("mode"), "columns");
 
     // Test default RSB variables
-    set_var("verbose", "1"); // 1=false
+    set_var("verbose", "false"); // RSB: standard Rust boolean
     assert!(!is_true("verbose"));
 
-    set_var("debug", "1"); // 1=false
+    set_var("debug", "false"); // RSB: standard Rust boolean
     assert!(!is_true("debug"));
 }
 

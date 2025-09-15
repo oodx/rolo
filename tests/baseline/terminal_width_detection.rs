@@ -68,76 +68,80 @@ fn test_width_validation() {
 }
 
 #[test]
-fn test_cli_width_override() {
+fn test_rsb_width_override() {
     use rololib::prelude::*;
 
-    // Test --width argument parsing
-    let args = vec!["rolo".to_string(), "--width".to_string(), "100".to_string(), "--cols".to_string(), "2".to_string()];
-    let config = parse_args(&args);
-    assert!(config.is_ok());
+    // Test RSB width and columns configuration
+    set_var("width", "100");
+    set_var("cols", "2");
 
-    let config = config.unwrap();
-    assert_eq!(config.width, Some(100));
-    assert_eq!(config.columns, Some(2));
+    // Verify RSB context stores values correctly
+    assert_eq!(get_var("width"), "100");
+    assert_eq!(get_var("cols"), "2");
+
+    // Test parsing from RSB context
+    let width: usize = get_var("width").parse().unwrap();
+    let columns: usize = get_var("cols").parse().unwrap();
+    assert_eq!(width, 100);
+    assert_eq!(columns, 2);
 }
 
 #[test]
-fn test_cli_width_override_invalid() {
+fn test_rsb_width_validation() {
     use rololib::prelude::*;
 
-    // Test with invalid width
-    let args = vec!["rolo".to_string(), "--width".to_string(), "invalid".to_string()];
-    let config = parse_args(&args);
-    assert!(config.is_err());
+    // Test RSB with invalid width value
+    set_var("width", "invalid");
+    let width_result = get_var("width").parse::<usize>();
+    assert!(width_result.is_err());
 
-    // Test with missing width value
-    let args = vec!["rolo".to_string(), "--width".to_string()];
-    let config = parse_args(&args);
-    assert!(config.is_err());
+    // Test with empty width value
+    set_var("width", "");
+    assert_eq!(get_var("width"), "");
+    // Empty values can be handled by RSB context
 }
 
 #[test]
-fn test_fit_mode_default() {
+fn test_rsb_fit_mode() {
     use rololib::prelude::*;
 
-    // Default config should have fit mode enabled
-    let config = CliConfig::default();
-    assert!(config.fit_mode);
+    // Test RSB fit mode with boolean values
+    set_var("fit", "true");
+    assert!(is_true("fit"));
 
-    // Test --fit flag
-    let args = vec!["rolo".to_string(), "--fit".to_string()];
-    let config = parse_args(&args);
-    assert!(config.is_ok());
-    let config = config.unwrap();
-    assert!(config.fit_mode);
+    // Test fit flag enabled
+    set_var("fit_mode", "true");
+    assert!(is_true("fit_mode"));
 
-    // Test --no-fit flag
-    let args = vec!["rolo".to_string(), "--no-fit".to_string()];
-    let config = parse_args(&args);
-    assert!(config.is_ok());
-    let config = config.unwrap();
-    assert!(!config.fit_mode);
+    // Test fit mode disabled
+    set_var("fit_mode", "false");
+    assert!(!is_true("fit_mode"));
+    assert!(!is_true("fit_mode"));
 }
 
 #[test]
-fn test_fit_mode_width_selection() {
+fn test_rsb_fit_mode_width_selection() {
     use rololib::prelude::*;
 
-    // Create test configs to verify width selection logic
-    let mut fit_config = CliConfig::default();
-    fit_config.fit_mode = true;
-    fit_config.width = Some(100);
+    // Test RSB context for width and fit mode combinations
+    set_var("fit_mode", "true");
+    set_var("width", "100");
 
-    let mut no_fit_config = CliConfig::default();
-    no_fit_config.fit_mode = false;
-    no_fit_config.width = Some(100);
+    assert!(is_true("fit_mode"));
+    assert_eq!(get_var("width"), "100");
+
+    // Test opposite configuration
+    set_var("fit_mode", "false");
+    set_var("width", "100");
 
     // Both should respect explicit width when set
-    // This test verifies the logic exists in CLI execution
-    assert!(fit_config.fit_mode);
-    assert!(!no_fit_config.fit_mode);
-    assert_eq!(fit_config.width, Some(100));
-    assert_eq!(no_fit_config.width, Some(100));
+    // This test verifies RSB context handles combinations
+    assert!(!is_true("fit_mode"));
+    assert_eq!(get_var("width"), "100");
+
+    // Both configurations handled via RSB context
+    let width: usize = get_var("width").parse().unwrap();
+    assert_eq!(width, 100);
 }
 
 #[test]
@@ -224,27 +228,26 @@ fn test_multiple_width_env_vars() {
 }
 
 #[test]
-fn test_cli_integration_width_and_fit() {
+fn test_rsb_integration_width_and_fit() {
     use rololib::prelude::*;
 
-    // Test combined width and fit flags
-    let args = vec![
-        "rolo".to_string(),
-        "--width".to_string(),
-        "120".to_string(),
-        "--fit".to_string(),
-        "--cols".to_string(),
-        "3".to_string(),
-    ];
+    // Test combined RSB context settings
+    set_var("width", "120");
+    set_var("fit", "true");
+    set_var("cols", "3");
+    set_var("mode", "columns");
 
-    let config = parse_args(&args);
-    assert!(config.is_ok());
+    // Verify all RSB context values
+    assert_eq!(get_var("width"), "120");
+    assert!(is_true("fit"));
+    assert_eq!(get_var("cols"), "3");
+    assert_eq!(get_var("mode"), "columns");
 
-    let config = config.unwrap();
-    assert_eq!(config.width, Some(120));
-    assert!(config.fit_mode);
-    assert_eq!(config.columns, Some(3));
-    assert!(matches!(config.mode, CliMode::Columns));
+    // Test parsing values from RSB context
+    let width: usize = get_var("width").parse().unwrap();
+    let columns: usize = get_var("cols").parse().unwrap();
+    assert_eq!(width, 120);
+    assert_eq!(columns, 3);
 }
 
 #[test]

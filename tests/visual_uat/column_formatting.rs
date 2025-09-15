@@ -58,7 +58,7 @@ fn visual_uat_basic_column_formatting() {
     set_var("mode", "columns");
     set_var("cols", "2");
     set_var("width", "80");
-    set_var("headers", "1"); // 1=false in RSB
+    set_var("headers", "false"); // RSB: standard Rust boolean
 
     println!("📋 RSB Integration Test:");
     println!("Mode: {}, Cols: {}, Width: {}", get_var("mode"), get_var("cols"), get_var("width"));

@@ -8,17 +8,17 @@ fn uat_rsb_help_system_usability() {
     use rololib::prelude::*;
 
     // Executive requirement: Help should be accessible via RSB global context
-    set_var("help", "0"); // 0=true in RSB
+    set_var("help", "true"); // RSB: standard Rust boolean
     assert!(is_true("help"), "Help flag should be recognized");
     println!("✅ Help system accessible via RSB context");
 
     // Executive requirement: Help can be toggled
-    set_var("help", "1"); // 1=false in RSB
+    set_var("help", "false"); // RSB: standard Rust boolean
     assert!(!is_true("help"), "Help flag should be toggleable");
     println!("✅ Help system toggleable");
 
     // Executive requirement: Version information should be accessible
-    set_var("version", "0"); // 0=true in RSB
+    set_var("version", "true"); // RSB: standard Rust boolean
     assert!(is_true("version"), "Version flag should be recognized");
     println!("✅ Version information accessible");
 
@@ -65,7 +65,7 @@ fn uat_rsb_error_prevention() {
     // Executive requirement: Invalid column counts should be validated
     let invalid_columns = ["0", "15", "abc", ""];
     for invalid_col in &invalid_columns {
-        set_var("cols", invalid_col);
+        set_var("cols", *invalid_col);
         // RSB stores any string value, but validation functions should catch issues
         if invalid_col.parse::<u8>().is_err() || invalid_col.parse::<u8>().unwrap_or(0) == 0 || invalid_col.parse::<u8>().unwrap_or(0) > 10 {
             println!("✅ Invalid column count '{}' would be caught by validation", invalid_col);
@@ -98,7 +98,7 @@ fn uat_rsb_business_compliance() {
     // Executive requirement: Column limits should enforce business rules
     let business_column_limits = ["1", "5", "10"]; // Valid business range
     for valid_cols in &business_column_limits {
-        set_var("cols", valid_cols);
+        set_var("cols", *valid_cols);
         let cols = get_var("cols").parse::<u8>().unwrap();
         assert!(cols >= 1 && cols <= 10, "Column count should be in business range");
         println!("✅ Business-valid column count {} accepted", cols);

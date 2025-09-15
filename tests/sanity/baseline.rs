@@ -6,10 +6,10 @@ fn test_project_compiles() {
     println!("Testing that the project compiles and modules are accessible...");
 
     // Test that we can access the core modules
-    let _layout_config = rolo::layout::utils::LayoutConfig::default();
+    let _layout_config = rololib::layout::utils::LayoutConfig::default();
     println!("✅ Layout module accessible");
 
-    let _width = rolo::width::get_terminal_width();
+    let _width = rololib::width::get_terminal_width();
     println!("✅ Width module accessible");
 
     // Test prelude imports
@@ -26,17 +26,17 @@ fn test_module_structure_compliance() {
     println!("Verifying MODULE_SPEC structure is followed...");
 
     // Test that error types exist
-    let _layout_error = rolo::layout::error::LayoutError::InvalidColumnCount(0);
+    let _layout_error = rololib::layout::error::LayoutError::InvalidColumnCount(0);
     println!("✅ Layout error types defined");
 
-    let _width_error = rolo::width::error::WidthError::InvalidInput("test".to_string());
+    let _width_error = rololib::width::error::WidthError::InvalidInput("test".to_string());
     println!("✅ Width error types defined");
 
     // Test placeholder functions exist
-    let _result = rolo::layout::utils::format_columns("test", 2);
+    let _result = rololib::layout::utils::format_columns("test", 2);
     println!("✅ Layout utilities accessible");
 
-    let _result = rolo::width::utils::get_display_width("test");
+    let _result = rololib::width::utils::get_display_width("test");
     println!("✅ Width utilities accessible");
 
     // Test RSB global context

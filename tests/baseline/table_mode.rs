@@ -275,15 +275,18 @@ fn test_table_mode_truncation() {
 }
 
 #[test]
-fn test_table_mode_cli_integration() {
+fn test_table_mode_rsb_integration() {
     use rololib::prelude::*;
 
-    // Test CLI configuration for table mode
-    let mut config = CliConfig::default();
-    config.mode = CliMode::Table;
-    config.delimiter = Some(",".to_string());
+    // Test RSB global context for table mode
+    set_var("mode", "table");
+    set_var("delimiter", ",");
 
-    // Should be able to construct this configuration
-    assert!(matches!(config.mode, CliMode::Table));
-    assert_eq!(config.delimiter, Some(",".to_string()));
+    // Should be able to read these configurations from RSB context
+    assert_eq!(get_var("mode"), "table");
+    assert_eq!(get_var("delimiter"), ",");
+
+    // Test that table mode can be detected from RSB context
+    let is_table_mode = get_var("mode") == "table";
+    assert!(is_table_mode);
 }

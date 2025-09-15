@@ -22,10 +22,10 @@ fn test_rsb_global_context() {
     set_var("test_key", "test_value");
     assert_eq!(get_var("test_key"), "test_value");
 
-    set_var("test_flag", "0"); // 0=true in RSB
+    set_var("test_flag", "true"); // RSB: standard Rust boolean
     assert!(is_true("test_flag"));
 
-    set_var("test_flag", "1"); // 1=false in RSB
+    set_var("test_flag", "false"); // RSB: standard Rust boolean
     assert!(!is_true("test_flag"));
 }
 

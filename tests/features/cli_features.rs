@@ -12,12 +12,12 @@ fn test_rsb_options_parsing() {
     println!("✅ cols option set correctly");
 
     // Test help flag (RSB boolean: 0=true, 1=false)
-    set_var("help", "0");
+    set_var("help", "true");
     assert!(is_true("help"));
     println!("✅ help flag set correctly");
 
     // Test version flag
-    set_var("version", "0");
+    set_var("version", "true");
     assert!(is_true("version"));
     println!("✅ version flag set correctly");
 

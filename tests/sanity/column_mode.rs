@@ -120,7 +120,7 @@ fn test_column_mode_rsb_integration_demo() {
     set_var("opt_cols", "3");
     set_var("opt_gap", "2");
     set_var("opt_width", "80");
-    set_var("opt_fit", "0"); // RSB: 0=true
+    set_var("opt_fit", "true"); // RSB: standard Rust boolean
 
     println!("RSB Global Context:");
     println!("  Columns: {}", get_var("opt_cols"));
