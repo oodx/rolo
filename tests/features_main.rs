@@ -8,6 +8,10 @@ mod width_features;
 #[path = "features/cli_features.rs"]
 mod cli_features;
 
+#[path = "features/layout/list_features.rs"]
+mod list_features;
+
 // Re-export feature tests
 pub use width_features::*;
 pub use cli_features::*;
+pub use list_features::*;

@@ -235,8 +235,150 @@ pub fn format_table(text: &str, delimiter: &str) -> Result<String, LayoutError> 
     format_table_with_config(text, delimiter, 80)
 }
 
-/// Format text as list (placeholder implementation)
-pub fn format_list(_text: &str) -> Result<String, LayoutError> {
-    // TODO: Implement in TASK-009
-    Ok("List formatting not yet implemented".to_string())
+/// List formatting configuration
+pub struct ListConfig {
+    pub width: usize,
+    pub line_numbers: bool,
+    pub list_style: Option<String>,
+    pub alignment: ListAlignment,
+}
+
+impl Default for ListConfig {
+    fn default() -> Self {
+        Self {
+            width: 80,
+            line_numbers: false,
+            list_style: None,
+            alignment: ListAlignment::Left,
+        }
+    }
+}
+
+/// List alignment options
+#[derive(Debug, Clone)]
+pub enum ListAlignment {
+    Left,
+    Right,
+    Center,
+}
+
+/// Format text as list with line numbers and alignment
+pub fn format_list_with_config(text: &str, config: &ListConfig) -> Result<String, LayoutError> {
+    if text.trim().is_empty() {
+        return Ok(String::new());
+    }
+
+    let lines: Vec<&str> = text.lines().filter(|line| !line.trim().is_empty()).collect();
+
+    if lines.is_empty() {
+        return Ok(String::new());
+    }
+
+    let mut result = Vec::new();
+    let line_count = lines.len();
+
+    // Calculate number/style width for line markers
+    let (marker_width, use_line_numbers) = if config.line_numbers {
+        (line_count.to_string().len(), true)
+    } else if config.list_style.is_some() {
+        (get_list_style_width(&config.list_style), false)
+    } else {
+        (0, false)
+    };
+
+    // Calculate available content width
+    let separator_width = if use_line_numbers || config.list_style.is_some() { 1 } else { 0 }; // " " after marker
+    let available_width = if config.width > marker_width + separator_width {
+        config.width - marker_width - separator_width
+    } else {
+        config.width.max(10) // Minimum usable width
+    };
+
+    for (i, line) in lines.iter().enumerate() {
+        let line_content = line.trim();
+        let line_number = i + 1;
+
+        // Format the line content with alignment
+        let aligned_content = match config.alignment {
+            ListAlignment::Left => {
+                if line_content.len() <= available_width {
+                    format!("{:<width$}", line_content, width = available_width)
+                } else {
+                    // Truncate with ellipsis if too long
+                    if available_width >= 3 {
+                        format!("{}...", &line_content[..available_width.saturating_sub(3)])
+                    } else {
+                        "...".to_string()
+                    }
+                }
+            }
+            ListAlignment::Right => {
+                if line_content.len() <= available_width {
+                    format!("{:>width$}", line_content, width = available_width)
+                } else {
+                    // Truncate with ellipsis if too long
+                    if available_width >= 3 {
+                        format!("...{}", &line_content[line_content.len().saturating_sub(available_width - 3)..])
+                    } else {
+                        "...".to_string()
+                    }
+                }
+            }
+            ListAlignment::Center => {
+                if line_content.len() <= available_width {
+                    format!("{:^width$}", line_content, width = available_width)
+                } else {
+                    // Truncate with ellipsis if too long
+                    if available_width >= 3 {
+                        format!("{}...", &line_content[..available_width.saturating_sub(3)])
+                    } else {
+                        "...".to_string()
+                    }
+                }
+            }
+        };
+
+        // Add line marker if requested
+        let formatted_line = if use_line_numbers {
+            format!("{:width$}. {}", line_number, aligned_content.trim_end(), width = marker_width)
+        } else if let Some(style) = &config.list_style {
+            let marker = get_list_style_marker(style, line_number);
+            format!("{} {}", marker, aligned_content.trim_end())
+        } else {
+            aligned_content.trim_end().to_string()
+        };
+
+        result.push(formatted_line);
+    }
+
+    Ok(result.join("\n"))
+}
+
+/// Format text as list (convenience function)
+pub fn format_list(text: &str) -> Result<String, LayoutError> {
+    format_list_with_config(text, &ListConfig::default())
+}
+
+/// Get the width needed for a list style marker
+fn get_list_style_width(style: &Option<String>) -> usize {
+    match style.as_deref() {
+        Some("numbers") => 2, // e.g., "1."
+        Some("bullets") => 1, // •
+        Some("stars") => 1,   // *
+        Some("dots") => 1,    // ·
+        Some("dash") => 1,    // -
+        _ => 1, // Default to single character
+    }
+}
+
+/// Get the marker string for a given list style and line number
+fn get_list_style_marker(style: &str, line_number: usize) -> String {
+    match style {
+        "numbers" => format!("{}.", line_number),
+        "bullets" => "•".to_string(),
+        "stars" => "*".to_string(),
+        "dots" => "·".to_string(),
+        "dash" => "-".to_string(),
+        _ => "•".to_string(), // Default to bullet
+    }
 }

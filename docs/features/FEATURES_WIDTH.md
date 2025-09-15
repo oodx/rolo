@@ -1,8 +1,8 @@
 # FEATURES_WIDTH.md - Width Calculation Module
 
-**Version**: v0.1.0
+**Version**: v0.1.1
 **Date**: 2025-09-15
-**Tasks**: TASK-002 (3 Story Points)
+**Tasks**: TASK-002 (3 Story Points), TASK-010 (3 Story Points)
 **Status**: Complete ✅
 
 ## Overview
@@ -11,11 +11,15 @@ The Width module provides accurate text width calculation for terminal output, w
 
 ## Core Features
 
-### 1. Terminal Width Detection
-- **Primary**: `tput cols` command with `/dev/tty` redirection
-- **Fallback**: `stty size` parsing with `/dev/tty` redirection
-- **Final Fallback**: 80 columns or `$COLUMNS` environment variable
-- **Range Validation**: Minimum 10 columns for usability
+### 1. Enhanced Terminal Width Detection (TASK-010)
+- **Method 1**: `$COLUMNS` environment variable (set by shell)
+- **Method 2**: ioctl system calls on Unix systems (real-time detection)
+- **Method 3**: `tput cols` command with cross-platform support
+- **Method 4**: Additional environment variables (`TERM_WIDTH`, `WIDTH`, `TERMWIDTH`)
+- **Final Fallback**: 80 columns default
+- **Range Validation**: 10-500 columns for expanded compatibility
+- **Resize Detection**: Atomic terminal size change tracking
+- **Fit Mode**: Automatic terminal width adaptation (default enabled)
 
 ### 2. Display Width Calculation
 - **Unicode-aware**: Proper handling of wide characters (CJK, emojis)
@@ -33,14 +37,16 @@ The Width module provides accurate text width calculation for terminal output, w
 ### Feature Flag System
 ```toml
 [features]
-width-boxy = ["strip-ansi-escapes", "unicode-width"]  # Full functionality
-width-unicode = ["unicode-width"]                     # Unicode only
+default = ["libc"]                                                    # Terminal detection
+width-boxy = ["strip-ansi-escapes", "unicode-width", "libc"]         # Full functionality
+width-unicode = ["unicode-width", "libc"]                            # Unicode + terminal
 ```
 
 ### Dependency Management
-- **strip-ansi-escapes**: v0.2 - ANSI escape sequence removal
-- **unicode-width**: v0.2.1 with `std` feature - Unicode width calculation
-- **Zero dependencies**: When width-boxy feature disabled
+- **libc**: v0.2 - Unix system calls for terminal detection (optional)
+- **strip-ansi-escapes**: v0.2 - ANSI escape sequence removal (optional)
+- **unicode-width**: v0.2.1 with `std` feature - Unicode width calculation (optional)
+- **Minimal dependencies**: Only libc for basic terminal detection
 
 ### MODULE_SPEC Compliance
 ```
@@ -57,16 +63,32 @@ src/width/
 ### Public Functions
 
 #### `get_terminal_width() -> usize`
-Returns current terminal width in columns.
+Returns current terminal width in columns with enhanced detection (TASK-010).
 
-**Behavior:**
-- With `width-boxy`: System command detection with TTY handling
-- Without `width-boxy`: `$COLUMNS` environment variable or 80
+**Detection Methods (in order):**
+1. `$COLUMNS` environment variable (shell-set)
+2. Unix ioctl system calls (real-time, requires libc feature)
+3. `tput cols` command (cross-platform)
+4. Additional environment variables (`TERM_WIDTH`, `WIDTH`, `TERMWIDTH`)
+5. Default fallback (80 columns)
 
 **Example:**
 ```rust
 let width = rolo::width::get_terminal_width();
 println!("Terminal is {} columns wide", width);
+// Range: 10-500 columns with validation
+```
+
+#### `check_terminal_resize() -> Option<(usize, usize)>`
+Detects terminal size changes with atomic tracking (TASK-010).
+
+**Returns:** `Some((width, height))` if size changed, `None` if unchanged.
+
+**Example:**
+```rust
+if let Some((width, height)) = rolo::width::check_terminal_resize() {
+    println!("Terminal resized to {}x{}", width, height);
+}
 ```
 
 #### `get_display_width(text: &str) -> Result<usize, WidthError>`
@@ -83,15 +105,16 @@ assert_eq!(width, 5); // "Hello" without ANSI codes
 ```
 
 #### `validate_width(width_str: &str) -> Result<usize, WidthError>`
-Validates and parses width input string.
+Validates and parses width input string with expanded range (TASK-010).
 
-**Range:** 10-200 columns
+**Range:** 10-500 columns (expanded from 10-200)
 **Errors:** `InvalidRange`, `InvalidInput`
 
 **Example:**
 ```rust
-let width = rolo::width::validate_width("80")?;
-assert_eq!(width, 80);
+let width = rolo::width::validate_width("120")?;
+assert_eq!(width, 120);
+// Now supports wider terminals up to 500 columns
 ```
 
 ## Error Handling
@@ -125,8 +148,9 @@ WidthError::InvalidInput("not_a_number".to_string())
 
 ### Test Results
 ```
-cargo test                    # 7/7 tests (fallback mode)
-cargo test --features width-boxy  # 11/11 tests (full features)
+cargo test                        # Enhanced with terminal width detection
+cargo test --features width-boxy  # Full feature set with ioctl detection
+cargo test terminal_width         # 12 dedicated terminal width tests (TASK-010)
 ```
 
 ## Boxy Integration
@@ -156,10 +180,16 @@ Width calculation logic directly adapted from `/boxy/src/width_plugin.rs`:
 
 ## Future Considerations
 
-### Potential Enhancements (Later Tasks)
-- **Caching**: Terminal width caching with invalidation on SIGWINCH
+### Recent Enhancements (TASK-010 ✅)
+- **Multi-method Detection**: Environment variables, ioctl, tput command fallbacks
+- **Terminal Resize Detection**: Atomic change tracking with `check_terminal_resize()`
+- **Expanded Range**: 10-500 column support for ultra-wide displays
+- **Cross-platform**: Unix ioctl with Windows/macOS environment fallbacks
+
+### Future Enhancements (Later Tasks)
+- **SIGWINCH Handling**: Signal-based resize event handling
 - **Advanced Unicode**: Grapheme cluster handling for complex scripts
-- **Custom Ranges**: Configurable width validation ranges
+- **Caching**: Performance optimization for repeated width queries
 - **Performance**: SIMD-accelerated ANSI stripping for large texts
 
 ### Integration Points
