@@ -1,0 +1,81 @@
+[package]
+name = "rolo"
+version = "0.1.0"
+edition = "2021"
+authors = ["RSB Contributors"]
+description = "Text layout tool for Unix pipelines - the spiritual love child of pr, paste, and col"
+license = "AGPL-3.0-or-later"
+repository = "https://github.com/oodx/rolo"
+keywords = ["cli", "text", "layout", "columns", "tables"]
+categories = ["command-line-utilities", "text-processing"]
+
+[[bin]]
+name = "rolo"
+path = "src/main.rs"
+
+[lib]
+name = "rolo"
+path = "src/lib.rs"
+
+[dependencies]
+# RSB Framework for string-biased, pragmatic Rust patterns
+rsb = { path = "../rsb", features = ["deps-libc"] }
+
+# Width calculation dependencies (for boxy adapter) - matching boxy versions
+strip-ansi-escapes = { version = "0.2", optional = true }
+unicode-width = { version = "0.2.1", features = ["std"], optional = true }
+
+# Optional format support (use RSB deps when available)
+csv = { version = "1.3", optional = true }
+serde_json = { version = "1.0", optional = true }
+
+[dev-dependencies]
+criterion = "0.5"
+
+[features]
+default = []
+
+# Width calculation strategies
+width-boxy = ["strip-ansi-escapes", "unicode-width"]
+width-unicode = ["unicode-width"]
+
+# Visual and formatting features
+visual = []
+themes = ["visual"]
+borders = ["visual"]
+colors = ["visual"]
+
+# Input/Output formats
+csv-support = ["csv"]
+json-support = ["serde_json"]
+markdown = []
+tokens = []
+
+# Umbrella features
+full = ["width-boxy", "themes", "borders", "colors", "csv-support", "json-support", "markdown", "tokens"]
+minimal = ["width-unicode"]
+
+# Development features
+dev = []
+bench = []
+
+# Test categories
+test-sanity = []
+test-features = []
+test-integration = []
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[profile.dev]
+opt-level = 0
+debug = true
+
+# Benchmarks will be added in later tasks
+# [[bench]]
+# name = "layout_bench"
+# harness = false
+# required-features = ["bench"]
