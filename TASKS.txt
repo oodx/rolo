@@ -1,374 +1,223 @@
-ROLO TASK BREAKDOWN
-===================
-Story Points: Fibonacci (1, 2, 3, 5, 8, 13)
-Sprint Velocity Target: 5-8 points
+# ROLO PROJECT TASKS
+# RSB Framework Text Layout Tool
+# Status: RSB Transformation Complete ✅
 
-============================================================================
-SPRINT 1-2: FOUNDATION (v0.1)
-Total Points: 15
-============================================================================
+## EPIC-001: Core Layout Engine Implementation
+### TASK-001: Implement Real Column Formatting Algorithm
+- **Priority**: P0 (Critical)
+- **Status**: TODO
+- **Estimate**: 3-4 hours
+- **Dependencies**: None
+- **Description**: Replace placeholder `format_columns()` with real algorithm
+- **Acceptance Criteria**:
+  - Distribute text across N columns with proper width calculation
+  - Handle text wrapping within column boundaries
+  - Maintain alignment and spacing
+  - Support gap configuration between columns
+- **Files**: `src/layout/utils.rs:format_columns()`
+- **Tests**: Existing baseline tests should pass with real implementation
 
-[3] TASK-001: Setup RSB Project with MODULE_SPEC Structure
-    - Initialize Cargo project with RSB dependency
-    - Create MODULE_SPEC compliant directories:
-      * layout/ (mod.rs, utils.rs, helpers.rs, error.rs, macros.rs)
-      * stream/ (mod.rs, utils.rs, helpers.rs, error.rs)
-      * width/ (mod.rs, utils.rs, error.rs, width_boxy_adapter.rs)
-      * cli/ (mod.rs, args.rs, dispatch.rs, error.rs)
-      * theme/ (mod.rs, utils.rs, macros.rs)
-    - Setup lib.rs with prelude exports
-    - Setup main.rs for CLI entry
-    - Configure rust-toolchain.toml
-    Acceptance: Project structure matches MODULE_SPEC exactly
+### TASK-002: Implement Table Rendering Engine
+- **Priority**: P0 (Critical)
+- **Status**: TODO
+- **Estimate**: 4-5 hours
+- **Dependencies**: TASK-001
+- **Description**: Build CSV/TSV table formatter with alignment
+- **Acceptance Criteria**:
+  - Parse delimited data (CSV, TSV, custom delimiters)
+  - Auto-detect column widths based on content
+  - Support left/right/center alignment
+  - Handle header rows with proper formatting
+  - Respect terminal width constraints
+- **Files**: `src/layout/utils.rs:format_table()`
+- **Tests**: Table mode baseline tests
 
-[3] TASK-002: Implement Width Module with Boxy Adapter
-    - Copy width calculation logic from boxy
-    - Create width_boxy_adapter.rs with feature gates
-    - Implement fallback for when boxy feature is disabled
-    - Add required dependencies (strip_ansi_escapes, unicode-width)
-    - Create width/error.rs with typed errors
-    - Write unit tests for both feature states
-    Acceptance: Width calculation works with and without boxy feature
+### TASK-003: Implement List Formatting System
+- **Priority**: P1 (High)
+- **Status**: TODO
+- **Estimate**: 2-3 hours
+- **Dependencies**: TASK-001
+- **Description**: Create list formatter with bullets and numbering
+- **Acceptance Criteria**:
+  - Support bullet points (•, -, *)
+  - Support numbered lists (1., a., i.)
+  - Handle nested indentation
+  - Proper line wrapping for long items
+- **Files**: `src/layout/utils.rs:format_list()`
+- **Tests**: List formatting tests
 
-[2] TASK-003: Setup Prelude and Module Exports
-    - Create prelude.rs with curated exports
-    - Setup module orchestrators (mod.rs files)
-    - Ensure no business logic in orchestrators
-    - Export module-owned macros properly
-    - Follow prelude policy (no optional features)
-    Acceptance: Clean public API surface, imports work
+## EPIC-002: Terminal Integration & Width Handling
+### TASK-004: Implement Terminal Width Detection
+- **Priority**: P0 (Critical)
+- **Status**: TODO
+- **Estimate**: 2-3 hours
+- **Dependencies**: None
+- **Description**: Real terminal width detection with fallbacks
+- **Acceptance Criteria**:
+  - Detect actual terminal width via termios
+  - Fallback to environment variables (COLUMNS, TERM_WIDTH)
+  - Default to 80 columns when detection fails
+  - Handle terminal resize events
+- **Files**: `src/width/utils.rs:get_terminal_width()`
+- **Tests**: Terminal width detection tests
 
-[3] TASK-004: Implement CLI Module with RSB Patterns
-    - Create cli/args.rs with RSB Args struct
-    - Implement cli/dispatch.rs with dispatch! macro
-    - Setup cli/error.rs for CLI errors
-    - Add --help, --version, --width subcommands
-    - Use validate! for error handling
-    Acceptance: CLI responds to commands with proper error handling
+### TASK-005: Implement ANSI Escape Sequence Handling
+- **Priority**: P1 (High)
+- **Status**: TODO
+- **Estimate**: 3-4 hours
+- **Dependencies**: TASK-004
+- **Description**: Strip ANSI codes for accurate width calculation
+- **Acceptance Criteria**:
+  - Detect and strip color escape sequences
+  - Handle cursor movement codes
+  - Preserve original text while calculating display width
+  - Support common terminal color formats
+- **Files**: `src/width/helpers.rs:strip_ansi_basic()`
+- **Tests**: ANSI handling tests
 
-[2] TASK-005: Stream Module Implementation ✅ COMPLETE
-    - Create stream/utils.rs with buffered reading
-    - Implement stream/helpers.rs for internal logic
-    - Setup stream/error.rs for stream errors
-    - Handle stdin/stdout properly
-    - Support pipe breaks and EOF
-    - Leverages RSB Stream and deps for robust Unix integration
-    - Includes comprehensive error handling and pipeline builder
-    Acceptance: Can pipe text through rolo
-    Tests: stream_sanity.rs with 7 passing tests
+### TASK-006: Implement Unicode Width Calculation
+- **Priority**: P1 (High)
+- **Status**: TODO
+- **Estimate**: 2-3 hours
+- **Dependencies**: TASK-005
+- **Description**: Proper Unicode character width calculation
+- **Acceptance Criteria**:
+  - Handle wide characters (CJK: 中文, 日本語)
+  - Handle zero-width characters (combining marks)
+  - Handle emojis and symbols correctly
+  - Use Unicode standard width definitions
+- **Files**: `src/width/utils.rs:get_display_width()`
+- **Tests**: Unicode width tests
 
-[2] TASK-006: Feature Flags and Testing Setup ✅ COMPLETE
-    - Configure Cargo.toml features per MODULE_SPEC
-    - Create baseline tests without features
-    - Add feature-gated tests for adapters
-    - Setup test structure per module
-    - Use utils::stderrx for non-visual logging
-    - Fixed all compilation errors in both test suites
-    - Created comprehensive baseline tests (26 tests passing)
-    - Created feature-gated tests for width-boxy and visual features (13 tests passing)
-    Acceptance: Tests pass in both default and feature modes
-    Tests: baseline_main.rs (26 tests), feature_gated_main.rs (13 tests)
+## EPIC-003: RSB CLI Integration
+### TASK-007: Implement Complete RSB Options System
+- **Priority**: P0 (Critical)
+- **Status**: TODO
+- **Estimate**: 3-4 hours
+- **Dependencies**: None
+- **Description**: Full CLI surface using RSB `options!()` macro
+- **Acceptance Criteria**:
+  - All CLI flags properly parsed via RSB
+  - Help generation works with `--help`
+  - Version display with `--version`
+  - Subcommands: columns, table, list
+  - Options: --width, --cols, --gap, --delimiter, --fit
+- **Files**: `src/main.rs` (options! section)
+- **Tests**: CLI features tests
 
-============================================================================
-VISUAL UAT TASKS (v0.1.5 - Foundation Enhancement)
-Total Points: 8
-============================================================================
+### TASK-008: Implement RSB Help System
+- **Priority**: P1 (High)
+- **Status**: TODO
+- **Estimate**: 2-3 hours
+- **Dependencies**: TASK-007
+- **Description**: Comprehensive help using RSB patterns
+- **Acceptance Criteria**:
+  - Generate help from RSB options definitions
+  - Show usage examples for each mode
+  - Display available subcommands and flags
+  - Context-sensitive help per subcommand
+- **Files**: `src/main.rs:cmd_help()`
+- **Tests**: Help system tests
 
-[2] TASK-007V: Visual Column Formatting UAT ✅ COMPLETE
-    - Create visual tests showing actual column output
-    - Test 1-10 column configurations with real text
-    - Validate alignment and spacing across widths
-    - Test edge cases: long words, empty lines, special chars
-    - Generate reference output for comparison
-    Acceptance: Visual column formatting demo works perfectly
-    Documentation: FEATURES_VISUAL_UAT.md
+## EPIC-004: Stream Processing & Performance
+### TASK-009: Implement Real Stream Processing
+- **Priority**: P1 (High)
+- **Status**: TODO
+- **Estimate**: 4-5 hours
+- **Dependencies**: TASK-001, TASK-002
+- **Description**: Handle large files and stdin efficiently
+- **Acceptance Criteria**:
+  - Process stdin pipe input
+  - Handle files larger than memory
+  - Chunked processing for large datasets
+  - Proper SIGPIPE handling
+  - Memory-efficient streaming
+- **Files**: `src/stream/utils.rs`, `src/stream/helpers.rs`
+- **Tests**: Stream processing tests
 
-[2] TASK-008V: Visual Table Formatting UAT ✅ COMPLETE
-    - Create visual tests for table mode with headers
-    - Test delimiter handling (tabs, spaces, custom)
-    - Validate column alignment and borders
-    - Test multi-line cells and overflow handling
-    - Generate TSV/CSV formatting examples
-    Acceptance: Table formatting produces clean aligned output
-    Documentation: FEATURES_VISUAL_UAT.md
+### TASK-010: Performance Optimization
+- **Priority**: P2 (Medium)
+- **Status**: TODO
+- **Estimate**: 3-4 hours
+- **Dependencies**: TASK-009
+- **Description**: Optimize for large datasets and speed
+- **Acceptance Criteria**:
+  - Benchmark against common use cases
+  - Optimize hot paths in layout algorithms
+  - Minimize memory allocations
+  - Parallel processing where beneficial
+- **Files**: All core implementation files
+- **Tests**: Performance benchmark tests
 
-[2] TASK-009V: Visual List Formatting UAT ✅ COMPLETE
-    - Create visual tests for list mode with bullets
-    - Test different bullet styles and indentation
-    - Validate line wrapping and continuation
-    - Test nested lists and numbering
-    - Generate markdown-style list examples
-    Acceptance: List formatting produces readable bulleted output
-    Documentation: FEATURES_VISUAL_UAT.md
+## EPIC-005: Production Readiness
+### TASK-011: Binary Verification & Integration Testing
+- **Priority**: P0 (Critical)
+- **Status**: TODO
+- **Estimate**: 2-3 hours
+- **Dependencies**: TASK-007
+- **Description**: Ensure working binary with real-world testing
+- **Acceptance Criteria**:
+  - `cargo build --release` produces working binary
+  - `cargo run -- --help` shows proper help
+  - Test with real CSV files, log data
+  - Integration with common Unix pipelines
+  - Verify all RSB patterns work end-to-end
+- **Files**: Binary compilation, integration tests
+- **Tests**: End-to-end integration tests
 
-[2] TASK-010V: Visual Width and Pipeline Integration UAT ✅ COMPLETE
-    - Create visual tests showing width adaptation (80, 120, 160 cols)
-    - Test pipeline integration: echo | rolo | visual comparison
-    - Validate ANSI color preservation through pipeline
-    - Test terminal width detection and override
-    - Generate side-by-side before/after examples
-    Acceptance: Width handling and pipeline integration work visually
-    Documentation: FEATURES_VISUAL_UAT.md
+### TASK-012: Error Handling & Edge Cases
+- **Priority**: P1 (High)
+- **Status**: TODO
+- **Estimate**: 2-3 hours
+- **Dependencies**: TASK-011
+- **Description**: Robust error handling for production use
+- **Acceptance Criteria**:
+  - Graceful handling of malformed input
+  - Proper error messages via RSB patterns
+  - Handle edge cases (empty input, huge files)
+  - Exit codes follow Unix conventions
+- **Files**: Error handling across all modules
+- **Tests**: Error condition tests
 
-============================================================================
-SPRINT 3-4: CORE MODES (v0.2)
-Total Points: 21
-============================================================================
+### TASK-013: Documentation & Examples
+- **Priority**: P2 (Medium)
+- **Status**: TODO
+- **Estimate**: 2-3 hours
+- **Dependencies**: TASK-011
+- **Description**: Complete documentation with RSB examples
+- **Acceptance Criteria**:
+  - Updated README with installation and usage
+  - RSB pattern examples and explanations
+  - Common use case examples
+  - API documentation for library usage
+- **Files**: README.md, docs/, code examples
+- **Tests**: Documentation tests (doctests)
 
-[5] TASK-007: Column Mode Implementation ✅ COMPLETE
-    - Parse --cols N argument
-    - Implement column layout algorithm
-    - Handle ANSI-aware width padding
-    - Add --gap option for spacing
-    - Add --delim option for custom input delimiters (space, comma, semicolon, etc.)
-    - Comprehensive column formatting with config support
-    - ANSI-aware width calculation using boxy adapter
-    - Gap spacing and width constraints implemented
-    - Proper error handling for edge cases
-    - Support for both newline (default) and custom delimiters
-    Acceptance: echo -e "a\nb\nc\nd" | rolo --cols 2 works (produces 2 columns)
-    Enhanced: echo "a,b,c,d" | rolo --cols 2 --delim "," works with comma delimiter
-    Tests: 11 comprehensive column mode tests added to baseline
+## TASK PRIORITIZATION MATRIX
 
-[5] TASK-008: Table Mode Implementation ✅ COMPLETE
-    - Parse --table flag
-    - Auto-detect column widths
-    - Implement --delim for parsing
-    - Handle row overflow
-    - Comprehensive table formatting with auto-width detection
-    - ANSI-aware width calculation and Unicode support
-    - Row overflow handling for uneven row structures
-    - Header row detection with automatic separator insertion
-    - Width constraints with proportional column compression
-    - Content truncation with ellipsis for overflow
-    - Support for multiple delimiters (TSV, CSV, custom)
-    Acceptance: cat tests/data/sample.tsv | rolo --table works ✅ VERIFIED
-    Enhanced: CSV, semicolon, and custom delimiter support via --delim
-    Tests: 14 comprehensive table mode tests added to baseline
+### Phase 1: Core Functionality (Required for MVP)
+- TASK-001: Column formatting (P0)
+- TASK-004: Terminal width detection (P0)
+- TASK-007: RSB options system (P0)
+- TASK-011: Binary verification (P0)
 
-[3] TASK-009: List Mode Implementation
-    - Single column formatting
-    - Optional line numbers
-    - Alignment options (left, right, center)
-    - Width constraints
-    Acceptance: ls | rolo --list works
+### Phase 2: Feature Completeness
+- TASK-002: Table rendering (P0)
+- TASK-005: ANSI handling (P1)
+- TASK-008: Help system (P1)
+- TASK-009: Stream processing (P1)
 
-[3] TASK-010: Terminal Width Detection ✅ COMPLETE
-    - Integrate RSB host module for $COLUMNS
-    - Implement --width override
-    - Add --fit mode (default)
-    - Handle terminal resize
-    - Enhanced terminal width detection with multiple fallback methods
-    - COLUMNS, TERM_WIDTH, WIDTH environment variable support
-    - ioctl system call detection on Unix systems (with libc feature)
-    - tput command fallback for maximum compatibility
-    - --fit mode enabled by default with --no-fit override option
-    - Terminal resize detection capabilities with atomic change tracking
-    - Width constraints validation (10-500 character range)
-    Acceptance: Respects terminal width ✅ VERIFIED
-    Enhanced: Multiple detection methods, resize handling, comprehensive CLI integration
-    Tests: 12 comprehensive terminal width detection tests added to baseline
+### Phase 3: Polish & Performance
+- TASK-003: List formatting (P1)
+- TASK-006: Unicode width (P1)
+- TASK-012: Error handling (P1)
+- TASK-010: Performance optimization (P2)
+- TASK-013: Documentation (P2)
 
-[3] TASK-011: Separator Support
-    - Implement --sep for input splitting
-    - Add regex separator support
-    - Handle multi-character separators
-    - Test with various delimiters
-    Acceptance: Can split on custom separators
-
-[2] TASK-012: Mode Integration Tests
-    - Create test fixtures for each mode
-    - Pipeline tests with sample data
-    - Edge case testing
-    - Performance baseline tests
-    Acceptance: All modes have test coverage
-
-============================================================================
-SPRINT 5-6: INTEGRATION (v0.3)
-Total Points: 13
-============================================================================
-
-[3] TASK-013: TokenStream Support
-    - Study RSB tokens module
-    - Implement TokenStream parser
-    - Add --tokens input mode
-    - Create token to table/column converter
-    Acceptance: Can process RSB TokenStreams
-
-[5] TASK-014: Pipeline Integration Tests
-    - Create jynx → rolo tests
-    - Create rolo → boxy tests
-    - Full pipeline jynx → rolo → boxy tests
-    - Document common patterns
-    Acceptance: Works in ecosystem pipelines
-
-[2] TASK-015: Performance Benchmarking
-    - Setup criterion benchmarks
-    - Benchmark each mode
-    - Profile memory usage
-    - Identify bottlenecks
-    Acceptance: Baseline metrics established
-
-[3] TASK-016: Documentation Sprint
-    - Write comprehensive README
-    - Create examples/ directory
-    - Document each mode with examples
-    - Add architecture.md
-    Acceptance: New users can understand rolo
-
-============================================================================
-SPRINT 7-8: POLISH (v0.4)
-Total Points: 13
-============================================================================
-
-[3] TASK-017: Advanced Alignment Options
-    - Per-column alignment (--align L,C,R)
-    - Padding control (--pad)
-    - Header row support (--headers)
-    - Footer row support
-    Acceptance: Fine-grained layout control
-
-[3] TASK-018: Border Styles
-    - Implement --border none|ascii|unicode
-    - Line drawing characters
-    - Corner handling
-    - Color support for borders
-    Acceptance: Tables can have borders
-
-[2] TASK-019: Truncation Policies
-    - Implement --truncate with ellipsis
-    - Add --wrap for line wrapping
-    - Smart truncation (word boundaries)
-    - Per-column truncation
-    Acceptance: Long content handled gracefully
-
-[3] TASK-020: Error Handling Enhancement
-    - Improve error messages
-    - Add --verbose debugging
-    - Handle malformed input gracefully
-    - Recovery strategies
-    Acceptance: Clear, helpful error messages
-
-[2] TASK-021: Test Coverage Push
-    - Achieve 80% code coverage
-    - Add property-based tests
-    - Fuzz testing for parsers
-    - Integration test expansion
-    Acceptance: Robust test suite
-
-============================================================================
-SPRINT 9-10: PLUGINS (v0.5)
-Total Points: 21
-============================================================================
-
-[5] TASK-022: Plugin Architecture
-    - Design RoloPlugin trait
-    - Implement plugin registry
-    - Create plugin lifecycle hooks
-    - Configuration loading system
-    Acceptance: Plugin system functional
-
-[3] TASK-023: CSV Plugin
-    - CSV parsing with configurable options
-    - Header detection
-    - Quote handling
-    - Type inference
-    Acceptance: CSV files render as tables
-
-[3] TASK-024: JSON Plugin
-    - JSON parsing and flattening
-    - Nested object handling
-    - Array formatting
-    - Pretty printing options
-    Acceptance: JSON data displays structured
-
-[3] TASK-025: Markdown Plugin
-    - Generate markdown tables
-    - GitHub-flavored markdown
-    - Alignment syntax
-    - Escape special characters
-    Acceptance: Output valid markdown tables
-
-[5] TASK-026: Configuration System
-    - Parse ~/.config/rolo/config.toml
-    - Environment variable overrides
-    - Default configurations
-    - Config validation
-    Acceptance: Configuration affects behavior
-
-[2] TASK-027: Plugin Documentation
-    - Plugin development guide
-    - Example plugin implementation
-    - API documentation
-    - Testing guidelines
-    Acceptance: Others can write plugins
-
-============================================================================
-SPRINT 11-12: PRODUCTION (v1.0)
-Total Points: 8
-============================================================================
-
-[3] TASK-028: Performance Optimization
-    - Zero-copy where possible
-    - Optimize hot paths
-    - Reduce allocations
-    - Parallel processing exploration
-    Acceptance: Handles 10k+ lines/sec
-
-[2] TASK-029: Release Preparation
-    - Cargo.toml metadata
-    - License selection
-    - CHANGELOG.md
-    - Security policy
-    Acceptance: Ready for crates.io
-
-[1] TASK-030: CI/CD Enhancement
-    - Release automation
-    - Binary builds for platforms
-    - Documentation generation
-    - Badge setup
-    Acceptance: Automated releases work
-
-[2] TASK-031: Paintbox Integration
-    - Coordinate with paintbox project
-    - Shared component extraction
-    - Version synchronization
-    - Integration testing
-    Acceptance: Works with paintbox
-
-============================================================================
-BACKLOG (Future Sprints)
-============================================================================
-
-[8] Advanced Unix Features
-    - pr: pagination, headers, footers
-    - paste: file merging, serial mode
-    - col: reverse line feeds, tab expansion
-
-[5] Theme System
-    - Shareable themes with jynx/boxy
-    - Theme inheritance
-    - Custom color schemes
-
-[8] Interactive Mode
-    - TUI for configuration
-    - Live preview
-    - Interactive column sizing
-
-[13] Network Features
-    - HTTP/HTTPS input sources
-    - Streaming from URLs
-    - WebSocket support
-
-[5] DSL for Layouts
-    - Custom layout language
-    - Template system
-    - Reusable layout definitions
-
-============================================================================
-NOTES
------
-- Tasks can be re-estimated after sprint planning
-- Dependencies between tasks should be considered
-- Some tasks can be done in parallel
-- Prefer shipping working features over perfect code
+## NOTES
+- All tasks build on the completed RSB transformation
+- Priority P0 = Critical for basic functionality
+- Priority P1 = High value features
+- Priority P2 = Polish and optimization
+- Estimates are for focused development time
+- Dependencies must be completed before dependent tasks
