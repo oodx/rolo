@@ -179,6 +179,116 @@ fn test_table_mode_with_uneven_rows() {
 }
 
 #[test]
+fn test_separator_support_columns() {
+    use rololib::prelude::*;
+
+    // Test comma-separated input
+    let input = "apple,banana,cherry,date,elderberry,fig";
+    let config = LayoutConfig {
+        width: 80,
+        gap: 2,
+        padding: 1,
+    };
+
+    let result = format_columns_with_delimiter(input, 2, &config, Some(","));
+    assert!(result.is_ok());
+
+    let output = result.unwrap();
+    assert!(output.contains("apple"));
+    assert!(output.contains("banana"));
+    assert!(output.contains("cherry"));
+    assert!(output.contains("date"));
+    assert!(output.contains("elderberry"));
+    assert!(output.contains("fig"));
+
+    // Should be formatted in 2 columns
+    let lines: Vec<&str> = output.lines().collect();
+    assert_eq!(lines.len(), 3); // 6 items in 2 columns = 3 rows
+}
+
+#[test]
+fn test_separator_support_pipe() {
+    use rololib::prelude::*;
+
+    // Test pipe-separated input
+    let input = "one|two|three|four";
+    let config = LayoutConfig {
+        width: 80,
+        gap: 2,
+        padding: 1,
+    };
+
+    let result = format_columns_with_delimiter(input, 2, &config, Some("|"));
+    assert!(result.is_ok());
+
+    let output = result.unwrap();
+    assert!(output.contains("one"));
+    assert!(output.contains("two"));
+    assert!(output.contains("three"));
+    assert!(output.contains("four"));
+
+    // Should be formatted in 2 columns
+    let lines: Vec<&str> = output.lines().collect();
+    assert_eq!(lines.len(), 2); // 4 items in 2 columns = 2 rows
+}
+
+#[test]
+fn test_separator_with_multiline_input() {
+    use rololib::prelude::*;
+
+    // Test separator working across multiple lines
+    let input = "a,b,c\nd,e,f\ng,h,i";
+    let config = LayoutConfig {
+        width: 80,
+        gap: 2,
+        padding: 1,
+    };
+
+    let result = format_columns_with_delimiter(input, 3, &config, Some(","));
+    assert!(result.is_ok());
+
+    let output = result.unwrap();
+
+    // All items should be present
+    for item in ["a", "b", "c", "d", "e", "f", "g", "h", "i"] {
+        assert!(output.contains(item), "Missing item: {}", item);
+    }
+
+    // Should be formatted in 3 columns
+    let lines: Vec<&str> = output.lines().collect();
+    assert_eq!(lines.len(), 3); // 9 items in 3 columns = 3 rows
+}
+
+#[test]
+fn test_separator_with_spaces() {
+    use rololib::prelude::*;
+
+    // Test semicolon separator with spaces around items
+    let input = "apple ; banana ; cherry ; date";
+    let config = LayoutConfig {
+        width: 80,
+        gap: 2,
+        padding: 1,
+    };
+
+    let result = format_columns_with_delimiter(input, 2, &config, Some(";"));
+    assert!(result.is_ok());
+
+    let output = result.unwrap();
+
+    // Items should be trimmed
+    assert!(output.contains("apple"));
+    assert!(output.contains("banana"));
+    assert!(output.contains("cherry"));
+    assert!(output.contains("date"));
+
+    // The items themselves should be trimmed (no leading/trailing spaces in the items)
+    // Note: The column layout may add spaces for alignment
+    let lines: Vec<&str> = output.lines().collect();
+    assert_eq!(lines.len(), 2); // 4 items in 2 columns = 2 rows
+}
+
+#[test]
 fn test_data_files_exist() {
     // Verify that our test data files are available
     let expected_files = [
