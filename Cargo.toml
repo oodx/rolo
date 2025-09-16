@@ -17,6 +17,10 @@ path = "src/main.rs"
 name = "rololib"
 path = "src/lib.rs"
 
+# Suppress warnings from dependencies for cleaner build output
+[lints.rust]
+dead_code = "warn"
+
 [dependencies]
 # RSB Framework for string-biased, pragmatic Rust patterns
 rsb = { path = "../rsb", features = ["deps-libc"] }

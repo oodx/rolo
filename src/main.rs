@@ -1,5 +1,8 @@
 //! Rolo CLI entry point - RSB Framework integration
 
+#![warn(clippy::all)]
+#![allow(unused_imports)] // Allow unused imports from dependencies
+
 use rsb::prelude::*;
 
 fn main() {

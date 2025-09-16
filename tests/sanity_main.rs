@@ -2,6 +2,8 @@
 //!
 //! Tests basic functionality without features, visible output for debugging
 
+#![allow(unused_imports)] // Test re-exports may not all be used
+
 #[path = "sanity/baseline.rs"]
 mod sanity_baseline;
 
