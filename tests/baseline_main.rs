@@ -24,6 +24,9 @@ mod integration_with_test_data;
 #[path = "baseline/terminal_width_detection.rs"]
 mod terminal_width_detection;
 
+#[path = "baseline/mode_integration.rs"]
+mod mode_integration;
+
 // Re-export baseline tests
 pub use core_functionality::*;
 pub use default_behavior::*;
@@ -32,3 +35,4 @@ pub use column_mode::*;
 pub use table_mode::*;
 pub use integration_with_test_data::*;
 pub use terminal_width_detection::*;
+pub use mode_integration::*;
