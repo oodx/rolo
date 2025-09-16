@@ -55,7 +55,7 @@ pub fn read_stdin() -> StreamResult<String> {
 /// Read stdin with custom configuration
 pub fn read_stdin_with_config(config: &StreamConfig) -> StreamResult<String> {
     let stdin = io::stdin();
-    let mut reader = BufReader::new(stdin.lock());
+    let reader = BufReader::new(stdin.lock());
     let mut buffer = Vec::new();
 
     // Read with size limit
@@ -127,7 +127,6 @@ where
 /// Check if stdin has data available (non-blocking)
 pub fn stdin_has_data() -> bool {
     use std::os::unix::io::AsRawFd;
-    use std::time::Duration;
 
     let stdin = io::stdin();
     let fd = stdin.as_raw_fd();

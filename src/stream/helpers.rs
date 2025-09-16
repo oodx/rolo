@@ -3,8 +3,10 @@
 //! Private implementation details for stream processing that are not part of the public API.
 //! These helpers support the main stream utilities with low-level operations.
 
+#![allow(dead_code)] // Helper functions for future stream processing features
+
 use super::error::{StreamError, StreamResult};
-use std::io::{self, BufRead, BufReader};
+use std::io::{self, BufRead};
 use std::process::{Command, Stdio};
 
 /// Buffer size for chunk reading operations

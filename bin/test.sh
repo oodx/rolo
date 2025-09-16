@@ -53,13 +53,13 @@ set -- "${ARGS[@]}"
 # Available tests for Rolo
 declare -A TESTS=(
     # Core functionality tests
-    ["sanity"]="sanity_main"                     # Sanity package (core + baseline)
-    ["baseline"]="baseline_main"                 # Baseline tests (no features required)
-    ["layout"]="features_layout"                 # Layout module tests (column/table/list)
-    ["width"]="features_width"                   # Width calculation tests (boxy adapter)
-    ["stream"]="features_stream"                 # Stream processing tests
-    ["cli"]="features_cli"                       # CLI argument parsing tests
-    ["theme"]="features_theme"                   # Theme system tests
+    ["sanity"]="sanity_main.rs"                 # Sanity package (core + baseline)
+    ["baseline"]="baseline_main.rs"             # Baseline tests (no features required)
+    ["layout"]="features_layout.rs"             # Layout module tests (column/table/list)
+    ["width"]="features_width.rs"               # Width calculation tests (boxy adapter)
+    ["stream"]="stream_sanity.rs"               # Stream processing tests
+    ["cli"]="features_cli.rs"                   # CLI argument parsing tests
+    ["theme"]="features_theme.rs"               # Theme system tests
 
     # Integration tests
     ["pipeline"]="integration_pipeline"          # Pipeline tests with jynx/boxy
@@ -67,11 +67,11 @@ declare -A TESTS=(
     ["ecosystem"]="integration_ecosystem"        # Full ecosystem integration
 
     # UAT tests
-    ["uat-columns"]="uat_main"                   # UAT: column mode demo
-    ["uat-tables"]="uat_main"                    # UAT: table mode demo
-    ["uat-themes"]="uat_main"                    # UAT: theme system demo
-    ["uat-pipeline"]="uat_main"                  # UAT: pipeline demo
-    ["visual-uat"]="visual_uat_main.rs"          # Visual UAT: executive formatting demos
+    ["uat-columns"]="uat_main.rs"               # UAT: column mode demo
+    ["uat-tables"]="uat_main.rs"                # UAT: table mode demo
+    ["uat-themes"]="uat_main.rs"                # UAT: theme system demo
+    ["uat-pipeline"]="uat_main.rs"              # UAT: pipeline demo
+    ["visual-uat"]="visual_uat_main.rs"         # Visual UAT: executive formatting demos
 
     # Performance tests
     ["perf"]="performance_baseline"              # Performance baseline tests

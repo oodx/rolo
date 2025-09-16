@@ -1,5 +1,7 @@
 //! Layout internal helpers per MODULE_SPEC
 
+#![allow(dead_code)] // Helper functions for future layout enhancements
+
 /// Internal helper for calculating column widths
 pub(crate) fn calculate_column_widths(_text: &str, _cols: usize) -> Vec<usize> {
     // TODO: Implement in TASK-007
