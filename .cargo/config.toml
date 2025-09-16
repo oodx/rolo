@@ -1,0 +1,20 @@
+# Cargo configuration for rolo project
+# Suppress warnings from dependencies for cleaner build output
+
+[build]
+# Suppress most warnings except errors and our own code issues
+rustflags = [
+    "-A", "dead_code",           # Allow unused functions (helper code for future)
+    "-A", "unused_imports",      # Allow unused imports (from dependencies)
+    "-W", "unused_variables",    # Still warn about unused variables (our code)
+    "-W", "unused_mut",          # Still warn about unnecessary mut (our code)
+]
+
+[target.x86_64-unknown-linux-gnu]
+# Keep the same flags for the specific target
+rustflags = [
+    "-A", "dead_code",
+    "-A", "unused_imports",
+    "-W", "unused_variables",
+    "-W", "unused_mut",
+]

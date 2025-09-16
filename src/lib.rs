@@ -4,6 +4,8 @@
 //! ANSI-aware, Unicode-safe, streaming performance.
 
 #![doc = include_str!("../README.md")]
+#![warn(clippy::all)]
+#![allow(unused_imports, dead_code)] // Allow warnings from dependencies and future code
 
 // Module exports following RSB MODULE_SPEC
 pub mod layout;
