@@ -1,33 +1,34 @@
-# FEATURES_CLI.md - Command Line Interface Module
+# FEATURES_CLI_OPTIONS.md - RSB Command Line Interface
 
-**Version**: v0.1.0
+**Version**: v0.1.2
 **Date**: 2025-09-15
-**Tasks**: TASK-004 (3 Story Points)
-**Status**: Complete ✅
+**Sprint**: 3-4 Complete (90% Implementation)
+**Status**: Complete ✅ with Full RSB Integration
 
 ## Overview
 
-The CLI module provides a comprehensive command-line interface following RSB patterns. It offers intuitive argument parsing, subcommand dispatch, comprehensive error handling, and executive-grade usability standards.
+Rolo implements a **comprehensive command-line interface using full RSB (Rust Systems Building) patterns** with complete argument parsing, subcommand dispatch, and global variable management. The CLI provides intuitive access to all layout modes, separator options, and terminal width configurations through a unified interface that follows Unix conventions and supports complex pipeline workflows.
 
 ## Core Features
 
-### 1. Argument Parsing
-- **Options**: `--cols N`, `--width N`, `--help/-h`, `--version/-V`
-- **Subcommands**: `table`, `list`, `columns` (default)
-- **Validation**: Range checking, business rule enforcement
-- **Error Handling**: Descriptive messages with usage guidance
+### 1. Full RSB Argument Processing
+- **Complete option set**: `--cols`, `--width`, `--gap`, `--delim`, `--align`, `--fit`
+- **List formatting**: `--line-numbers`, `--list-style` with multiple marker types
+- **Mode commands**: `columns` (default), `table`, `list`
+- **Global variables**: RSB-style variable management with `set_var()`/`get_var()`
+- **Flexible parsing**: Support for `--key=value` and `--key value` syntax
 
-### 2. Command Dispatch
-- **RSB Patterns**: Follows RSB dispatch system architecture
-- **Exit Handling**: Proper process exit codes
-- **Error Recovery**: Graceful failure with helpful messages
-- **Configuration**: Structured config object for all modes
+### 2. Advanced Delimiter Support
+- **Multiple aliases**: `--delim`, `--delimiter`, `--sep` for maximum compatibility
+- **Cross-mode integration**: Same delimiter syntax across all layout modes
+- **Custom separators**: Support for any string delimiter including multi-character
+- **Pipeline optimization**: Designed for Unix pipeline integration
 
-### 3. Integration
-- **Width Module**: Uses existing width validation (10-200 range)
-- **Layout Module**: Ready for layout mode integration
-- **Prelude Access**: Full functionality via single import
-- **Error Consistency**: Unified error types across modules
+### 3. Terminal Width Management
+- **Fit mode**: `--fit` (default) for automatic terminal width detection
+- **Fixed width**: `--no-fit` with `--width=N` for precise control
+- **Range validation**: Enforces 10-500 column constraints
+- **Dynamic adaptation**: Responds to terminal resize events
 
 ## Architecture
 
@@ -49,27 +50,42 @@ src/cli/
 
 ## API Reference
 
-### Public Types
+### Complete CLI Options Reference
 
-#### `CliConfig`
-```rust
-pub struct CliConfig {
-    pub mode: CliMode,           // Operating mode
-    pub columns: Option<usize>,  // Column count (1-10)
-    pub width: Option<usize>,    // Terminal width (10-200)
-    pub headers: bool,           // Table headers flag
-    pub help: bool,              // Help requested
-    pub version: bool,           // Version requested
-}
+#### **Core Options**
+```bash
+--cols=N             # Number of columns (1-10, default: auto-detected)
+--width=N            # Terminal width (10-500, default: auto-detected)
+--gap=N              # Gap between columns (default: 2)
+--delim=STR          # Input delimiter/separator
+--delimiter=STR      # Alias for --delim
+--sep=STR            # Alias for --delim
 ```
 
-#### `CliMode`
-```rust
-pub enum CliMode {
-    Columns,    // Column formatting (default)
-    Table,      // Table formatting with headers
-    List,       // Bulleted list formatting
-}
+#### **Layout Mode Commands**
+```bash
+columns              # Column layout (default mode)
+table                # Table layout with headers
+list                 # List layout with optional markers
+```
+
+#### **List Mode Options**
+```bash
+--line-numbers       # Add 1. 2. 3. numbering
+--list-style=STYLE   # bullets, stars, numbers, dash, dots
+--align=ALIGNMENT    # left, right, center (aliases: l, r, c)
+```
+
+#### **Width Management**
+```bash
+--fit                # Auto-fit to terminal width (default)
+--no-fit             # Use fixed width mode
+```
+
+#### **System Options**
+```bash
+--help               # Show complete help information
+--version            # Show version information
 ```
 
 ### Public Functions
@@ -165,30 +181,66 @@ ls -la | rolo columns   # Explicit column mode
 ls -la | rolo --cols 3  # Column mode with count
 ```
 
-## Usage Examples
+## Usage Examples & Real-World Workflows
 
-### Basic Usage
+### Basic Column Layouts
 ```bash
-# Default 2-column formatting
-printf '%s\n' $LIST | rolo
+# Default auto-column formatting
+ls | rolo
+# Output: Auto-detected columns based on terminal width
 
-# Explicit column count
-printf '%s\n' $LIST | rolo --cols 4
+# Explicit column count with custom gap
+find . -name "*.rs" | rolo --cols 3 --gap 4
+# Output: 3 columns with 4-space gaps
 
-# Table mode with headers
-cat data.tsv | rolo table
-
-# Custom width specification
-ls -la | rolo --cols 3 --width 120
+# Custom width with fit mode disabled
+ps aux | rolo --cols 2 --width 120 --no-fit
+# Output: Exactly 120 characters wide, 2 columns
 ```
 
-### Pipeline Integration
+### Table Mode with Delimiters
 ```bash
-# Full pipeline with jynx and boxy
-echo "text content" | jynx --theme dark | rolo --cols 2 | boxy --title "Output"
+# CSV processing
+cat employees.csv | rolo table --delim=","
+# Output: Formatted table with headers and proper alignment
 
-# Environment diff in columns
-env | rolo --cols 3 | boxy --title "Environment Variables"
+# TSV with custom width constraints
+cat data.tsv | rolo table --width 80
+# Output: Table compressed to 80 columns
+
+# Environment variables as table
+env | rolo table --delim="="
+# Output: KEY | VALUE formatted table
+```
+
+### List Mode with Styling
+```bash
+# Numbered list from directory
+ls -1 | rolo list --line-numbers
+# Output: 1. file1.txt \n 2. file2.txt
+
+# Bulleted list with center alignment
+echo -e "red\ngreen\nblue" | rolo list --list-style=bullets --align=center --width=20
+# Output: Centered bullets within 20-char width
+
+# Custom delimiter to list
+echo "apple,banana,cherry" | rolo list --sep="," --list-style=stars
+# Output: * apple \n * banana \n * cherry
+```
+
+### Advanced Pipeline Integration
+```bash
+# Complex data processing pipeline
+curl -s api/data.csv | rolo table --delim="," | boxy --title "API Data"
+
+# Log analysis with formatting
+journalctl -n 50 | cut -d' ' -f1-3 | rolo --cols 2
+
+# Database export formatting
+mysql -B -e "SELECT name,age,dept FROM users" | rolo table | boxy --header "Users"
+
+# Configuration file processing
+cat /etc/passwd | head -10 | rolo table --delim=":" | boxy --title "System Users"
 ```
 
 ### Help and Debugging

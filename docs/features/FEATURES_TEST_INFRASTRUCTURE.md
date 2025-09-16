@@ -36,6 +36,7 @@ tests/
 │   ├── table_formatting.rs     # Visual table output validation
 │   ├── list_formatting.rs      # Visual list formatting validation
 │   ├── width_integration.rs    # Terminal width adaptation testing
+│   ├── separator_demo.rs       # Comprehensive separator/delimiter testing ✅ NEW
 │   └── column_mode_uat.rs      # Executive column mode demonstration
 ├── uat/                         # User Acceptance Testing
 │   ├── acceptance_baseline.rs
