@@ -17,9 +17,13 @@ mod width_integration;
 #[path = "visual_uat/column_mode_uat.rs"]
 mod column_mode_uat;
 
+#[path = "visual_uat/separator_demo.rs"]
+mod separator_demo;
+
 // Re-export visual UAT tests
 pub use column_formatting::*;
 pub use table_formatting::*;
 pub use list_formatting::*;
 pub use width_integration::*;
 pub use column_mode_uat::*;
+pub use separator_demo::*;

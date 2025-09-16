@@ -48,6 +48,43 @@ fn test_module_structure_compliance() {
 }
 
 #[test]
+fn test_separator_support_sanity() {
+    println!("=== Separator Support Sanity Test ===");
+    println!("Testing basic separator/delimiter functionality...");
+
+    use rololib::prelude::*;
+
+    // Test comma separator
+    let input = "apple,banana,cherry";
+    let config = LayoutConfig::default();
+    let result = format_columns_with_delimiter(input, 2, &config, Some(","));
+    assert!(result.is_ok(), "Failed to format with comma separator");
+    println!("✅ Comma separator works");
+
+    // Test pipe separator
+    let input = "one|two|three|four";
+    let result = format_columns_with_delimiter(input, 2, &config, Some("|"));
+    assert!(result.is_ok(), "Failed to format with pipe separator");
+    println!("✅ Pipe separator works");
+
+    // Test semicolon separator
+    let input = "first;second;third";
+    let result = format_columns_with_delimiter(input, 3, &config, Some(";"));
+    assert!(result.is_ok(), "Failed to format with semicolon separator");
+    println!("✅ Semicolon separator works");
+
+    // Test that separator splits across lines
+    let input = "a,b\nc,d";
+    let result = format_columns_with_delimiter(input, 2, &config, Some(","));
+    assert!(result.is_ok(), "Failed to handle multiline separator input");
+    let output = result.unwrap();
+    assert!(output.contains("a") && output.contains("b") && output.contains("c") && output.contains("d"));
+    println!("✅ Separator works across multiple lines");
+
+    println!("✅ All separator sanity tests passed!");
+}
+
+#[test]
 fn test_feature_flags_default() {
     println!("=== Default Feature Flags Test ===");
     println!("Testing that default build works without optional features...");

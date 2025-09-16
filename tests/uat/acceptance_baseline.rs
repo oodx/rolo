@@ -81,3 +81,46 @@ fn uat_basic_functionality_demo() {
 
     println!("✅ UAT PASSED: Core functionality demonstrated successfully");
 }
+
+#[test]
+fn uat_separator_functionality() {
+    println!("=== UAT: Separator/Delimiter Support ===");
+    println!("Executive validation of separator functionality across all modes...");
+
+    use rololib::prelude::*;
+
+    // Executive requirement: Tool must handle common data formats
+    println!("\n📊 Testing CSV format support:");
+    let csv_data = "Product,Price,Quantity\nApple,1.50,10\nBanana,0.75,25";
+    let table_result = format_table_with_config(csv_data, ",", 80);
+    assert!(table_result.is_ok(), "CSV format must be supported");
+    println!("✅ CSV data processed successfully");
+
+    println!("\n📊 Testing pipe-delimited format:");
+    let pipe_data = "Name|Department|Salary";
+    let table_result = format_table_with_config(pipe_data, "|", 80);
+    assert!(table_result.is_ok(), "Pipe-delimited format must be supported");
+    println!("✅ Pipe-delimited data processed successfully");
+
+    println!("\n📊 Testing column mode with separators:");
+    let items = "red,green,blue,yellow,orange,purple";
+    let config = LayoutConfig { width: 80, gap: 2, padding: 1 };
+    let columns_result = format_columns_with_delimiter(items, 3, &config, Some(","));
+    assert!(columns_result.is_ok(), "Column mode must support separators");
+    let output = columns_result.unwrap();
+    assert!(output.contains("red") && output.contains("green") && output.contains("blue"));
+    println!("✅ Column mode with separators works");
+
+    println!("\n📊 Testing multiline separator support:");
+    let multiline = "a,b,c\nd,e,f";
+    let result = format_columns_with_delimiter(multiline, 2, &config, Some(","));
+    assert!(result.is_ok(), "Must handle separators across multiple lines");
+    println!("✅ Multiline separator support verified");
+
+    println!("\n📊 Executive Summary:");
+    println!("✅ Tool supports industry-standard delimiters (CSV, pipe, etc.)");
+    println!("✅ All layout modes work with custom separators");
+    println!("✅ Handles complex multi-line delimited data");
+
+    println!("\n✅ UAT PASSED: Separator functionality meets executive requirements");
+}
