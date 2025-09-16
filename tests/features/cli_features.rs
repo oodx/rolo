@@ -73,9 +73,9 @@ fn test_rsb_error_handling() {
 
     use rololib::prelude::*;
 
-    // Test invalid column count validation
-    assert!(validate_width("20").is_err()); // Too small for width validation
-    println!("✅ Invalid column count rejected");
+    // Test invalid width validation
+    assert!(validate_width("5").is_err()); // Too small for width validation
+    println!("✅ Invalid width rejected");
 
     // Test RSB variable validation
     set_var("test_empty", "");

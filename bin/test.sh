@@ -55,11 +55,11 @@ declare -A TESTS=(
     # Core functionality tests
     ["sanity"]="sanity_main.rs"                 # Sanity package (core + baseline)
     ["baseline"]="baseline_main.rs"             # Baseline tests (no features required)
-    ["layout"]="features_layout.rs"             # Layout module tests (column/table/list)
-    ["width"]="features_width.rs"               # Width calculation tests (boxy adapter)
+    ["layout"]="features_main.rs"               # Layout module tests (column/table/list)
+    ["width"]="feature_gated_main.rs"           # Width calculation tests (boxy adapter)
     ["stream"]="stream_sanity.rs"               # Stream processing tests
-    ["cli"]="features_cli.rs"                   # CLI argument parsing tests
-    ["theme"]="features_theme.rs"               # Theme system tests
+    ["cli"]="features_main.rs"                  # CLI argument parsing tests
+    ["theme"]="feature_gated_main.rs"           # Theme system tests
 
     # Integration tests
     ["pipeline"]="integration_pipeline"          # Pipeline tests with jynx/boxy
@@ -67,11 +67,11 @@ declare -A TESTS=(
     ["ecosystem"]="integration_ecosystem"        # Full ecosystem integration
 
     # UAT tests
-    ["uat-columns"]="uat_main.rs"               # UAT: column mode demo
-    ["uat-tables"]="uat_main.rs"                # UAT: table mode demo
+    ["uat-columns"]="visual_demo_main.rs"       # UAT: column mode demo with real output
+    ["uat-tables"]="visual_demo_main.rs"        # UAT: table mode demo with real output
     ["uat-themes"]="uat_main.rs"                # UAT: theme system demo
     ["uat-pipeline"]="uat_main.rs"              # UAT: pipeline demo
-    ["visual-uat"]="visual_uat_main.rs"         # Visual UAT: executive formatting demos
+    ["visual-uat"]="visual_demo_main.rs"        # Visual UAT: executive formatting demos
 
     # Performance tests
     ["perf"]="performance_baseline"              # Performance baseline tests
@@ -260,7 +260,8 @@ run_test() {
                 ;;
         esac
 
-        if [[ "$VERBOSE_MODE" == "true" ]]; then
+        # UAT tests should always show output (that's the point!)
+        if [[ "$test_name" == *"uat"* || "$test_name" == *"visual"* || "$VERBOSE_MODE" == "true" ]]; then
             cargo test $features --test "$wrapper_name" -- --nocapture
         else
             cargo test $features --test "$wrapper_name"
@@ -279,6 +280,18 @@ run_test() {
 
     # Change to project root
     cd "$ROOT_DIR"
+
+    # Build the project first (always ensure we're testing latest code)
+    if [[ -n "$BOXY" ]]; then
+        echo "🔨 Building project..." | $BOXY --theme info --title "🎯 Rolo Test Runner" --width max
+    else
+        echo "🔨 Building project..."
+    fi
+
+    if ! cargo build --quiet; then
+        echo "❌ Build failed! Cannot run tests."
+        exit 1
+    fi
 
     # Export test configuration
     export ROLO_TEST_MODE="true"
